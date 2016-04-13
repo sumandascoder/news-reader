@@ -1,6 +1,6 @@
 # News Reader App 
 
-### BUILT IN A DAY (More of inspiration to build something new than code bravery) - Getting inspired from Bret McGowen's talk at GDG NYC about Cloud Vision API
+### BUILT IN 5 HOURS (More of inspiration to build something new than code bravery) - Getting inspired from Bret McGowen's talk at GDG NYC about Cloud Vision API
 
 
 In most of the nations we still have the printed newspaper and as we know "Old habits die hard", there are millions who still prefer to use print media oven pixels. And out of them at least 20% can't use the print media because with age things get blurry(I mean literally blurry) but they still like to go for the same media. With different constraints like limited time, availability people want to get most out of their time. This small app actually saves ample time for them.
