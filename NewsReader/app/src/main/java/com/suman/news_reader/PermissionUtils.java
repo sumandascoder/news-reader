@@ -1,4 +1,4 @@
-package sample.google.com.news_reader;
+package com.suman.news_reader;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -7,6 +7,10 @@ import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
 
+/**
+ * @author ssducharitdas
+ * Ref: From Google Cloud Vision Sameple APIs
+ */
 public class PermissionUtils {
     public static boolean requestPermission(Activity activity, int requestCode, String... permissions) {
         boolean granted = true;

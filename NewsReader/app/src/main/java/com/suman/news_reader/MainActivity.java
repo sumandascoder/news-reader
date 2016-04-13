@@ -1,4 +1,4 @@
-package sample.google.com.news_reader;
+package com.suman.news_reader;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -41,8 +41,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import sample.google.com.cloudvision.R;
+import com.suman.news_reader.PermissionUtils;
 
+/**
+ * @author ssducharitdas
+ * Ref: From Google Cloud Vision Sameple APIs
+ * Class does the following:
+ * - Allows user to interact with Cloud Vision API (OCR)
+ * - Let user upload images and extracts the text out of it
+ * - Once processed let user listen to the text read out to him.
+ */
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener{
     private static final String CLOUD_VISION_API_KEY = "AIzaSyDwZTPG0I6A0mVSdynNVhIaaJ69MPq2TTk";
     public static final String FILE_NAME = "temp.jpg";
