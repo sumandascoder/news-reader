@@ -1,4 +1,4 @@
-package com.suman.news_reader;
+package com.suman.news_reader.utils;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;

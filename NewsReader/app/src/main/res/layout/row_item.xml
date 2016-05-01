@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/darker_gray"
+    android:descendantFocusability="blocksDescendants">
+
+    <ImageView
+        android:id="@+id/listImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        android:focusable="false"
+        android:clickable="false"
+        android:src="@drawable/ic_speaker"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/listImage">
+        <TextView
+            android:id="@+id/headerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:focusable="false"
+            android:clickable="false" />
+        <TextView
+            android:id="@+id/detailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_below="@id/headerText"
+            android:textColor="#000000"
+            android:focusable="false"
+            android:clickable="false" />
+        <CheckBox
+            android:id="@+id/select"
+            android:layout_toRightOf="@id/headerText"
+            android:layout_width="wrap_content"
+            android:visibility="invisible"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+</RelativeLayout>

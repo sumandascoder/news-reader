@@ -1,20 +1,30 @@
-package com.suman.news_reader;
+package com.suman.news_reader.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,53 +43,126 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-
+import android.support.v7.app.ActionBarDrawerToggle;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
-import com.suman.news_reader.PermissionUtils;
+import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
+import com.suman.news_reader.older_news.NROlderNewsList;
+import com.suman.news_reader.older_news.OlderNewsFileNamesPOJO;
+import com.suman.news_reader.utils.CameraUtil;
+import com.suman.news_reader.utils.PermissionUtils;
+import com.suman.news_reader.R;
 
 /**
- * @author ssducharitdas
+ * @author ssucharitdas
  * Ref: From Google Cloud Vision Sameple APIs
  * Class does the following:
  * - Allows user to interact with Cloud Vision API (OCR)
  * - Let user upload images and extracts the text out of it
  * - Once processed let user listen to the text read out to him.
  */
-public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener{
-    private static final String CLOUD_VISION_API_KEY = "AIzaSyDwZTPG0I6A0mVSdynNVhIaaJ69MPq2TTk";
-    public static final String FILE_NAME = "temp.jpg";
+public class NRMainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, LanguageDialog.AlertPositiveListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int GALLERY_IMAGE_REQUEST = 1;
-    public static final int CAMERA_PERMISSIONS_REQUEST = 2;
-    public static final int CAMERA_IMAGE_REQUEST = 3;
+    public static final String      FILE_NAME = "temp.jpg";
+    public static final int         CAMERA_PERMISSIONS_REQUEST = 2;
+    public static final int         CAMERA_IMAGE_REQUEST = 3;
+    public static final int         MUSIC_PLAYER_REQUEST = 4;
 
-    private TextView mImageDetails;
-    private ImageView mMainImage;
+    private static final String     TAG = NRMainActivity.class.getSimpleName();
+    private static final int        GALLERY_IMAGE_REQUEST = 1;
+    private static final String     CLOUD_VISION_API_KEY = "AIzaSyCsGPZ_UVj0GRT6ii4GojaiDYf2c06lDDQ";
+    private String                  speechText = "I have nothing to speak of now.";
+    private String                  fileID;
+    private HashMap<String, String> map = new HashMap<String, String>();
+    private String                  dir = Environment.getExternalStorageDirectory() + "/NewsReader/";
+    private File                    f = new File(dir);
 
-    // TTS
-    private String speechText = "I have nothing to speak of now.";
-    private TextToSpeech tts;
+    private TextView                mImageDetails;
+    private ImageView               mMainImage;
+    private TextToSpeech            tts;
+    private FloatingActionButton    galleryFAB;
+    private FloatingActionButton    mikeFAB;
+
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle drawerToggle;
+    NavigationView navView;
+    CoordinatorLayout rootLayout;
+    GoogleTranslate translator;
+    int position;
+    String currentLanguageCode = "en";
+    String[] colors = {"#96CC7A", "#EA705D", "#66BBCC"};
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-        tts = new TextToSpeech(this, this);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerToggle = new ActionBarDrawerToggle(NRMainActivity.this, drawerLayout, R.string.app_name, R.string.app_name);
+        drawerLayout.setDrawerListener(drawerToggle);
+        new OlderNewsFileNamesPOJO();
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        navView = (NavigationView) findViewById(R.id.navigation);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                if (menuItem.getItemId() == R.id.nav_older_news) {
+                    Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
+                    newsActivity.putExtra("speechText", speechText);
+                    newsActivity.putExtra("fileID", fileID);
+                    startActivityForResult(newsActivity, MUSIC_PLAYER_REQUEST);
+                }
+                /* else if(menuItem.getItemId() == R.id.nav_lang) {
+                    FragmentManager manager = getFragmentManager();
+
+                    // Instantiating the DialogFragment class
+                    LanguageDialog alert = new LanguageDialog();
+
+                    // Creating a bundle object to store the selected item's index
+                    Bundle b  = new Bundle();
+
+                    // Storing the selected item's index in the bundle object
+                    b.putInt("position", position);
+
+                    // Setting the bundle object to the dialog fragment object
+                    alert.setArguments(b);
+
+                    // Creating the dialog fragment object, which will in turn open the alert dialog window
+                    alert.show(manager, "alert_dialog_radio");
+                } **/
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        FloatingActionButton galleryFAB = (FloatingActionButton) findViewById(R.id.galleryFAB);
+        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
+
+        fileID = UUID.randomUUID().toString();
+        tts = new TextToSpeech(this, this);
+        tts.setLanguage(Locale.US);
+
+        galleryFAB = (FloatingActionButton) findViewById(R.id.galleryFAB);
         galleryFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(NRMainActivity.this);
                 builder
                         .setMessage(R.string.dialog_select_prompt)
                         .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
@@ -98,16 +181,28 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
-        FloatingActionButton mikeFAB = (FloatingActionButton) findViewById(R.id.mikeFAB);
+        mikeFAB = (FloatingActionButton) findViewById(R.id.mikeFAB);
         mikeFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                speakOut();
+                if (!mikeFAB.isEnabled()) {
+                    Toast.makeText(getApplicationContext(), "Not enabled as no audio", Toast.LENGTH_LONG).show();
+                }
+                Intent startMusic = new Intent(getApplication(), NRMusicPlayerActivity.class);
+                startMusic.putExtra("speechText", speechText);
+                startMusic.putExtra("fileID", fileID);
+                startActivityForResult(startMusic, MUSIC_PLAYER_REQUEST);
             }
         });
+        mikeFAB.setEnabled(false);
 
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
+
+        if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
+            uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
+        }
+
     }
 
     public void startGalleryChooser() {
@@ -141,6 +236,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         else if(requestCode == CAMERA_IMAGE_REQUEST && resultCode == RESULT_OK) {
             uploadImage(Uri.fromFile(getCameraFile()));
         }
+        else if(requestCode == MUSIC_PLAYER_REQUEST && resultCode == RESULT_OK){
+            // DO NOTHING
+        }
     }
 
     @Override
@@ -151,15 +249,38 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void uploadImage(Uri uri) {
         if (uri != null) {
             try {
                 // scale the image to 800px to save on bandwidth
                 Bitmap bitmap = scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 1200);
-
-                callCloudVision(bitmap);
                 mMainImage.setImageBitmap(bitmap);
-
+                callCloudVision(bitmap);
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
                 Toast.makeText(this, R.string.image_picker_error, Toast.LENGTH_LONG).show();
@@ -269,44 +390,121 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             speechText = "";
             speechText += String.format("%s", textAnnotations.get(0).getDescription());
             message += String.format("%s", textAnnotations.get(0).getDescription());
+            onInit(TextToSpeech.SUCCESS);
         } else {
             speechText = "I found no text";
             message += "nothing";
         }
-
         return message;
     }
 
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-
-            int result = tts.setLanguage(Locale.US);
-
-            if (result == TextToSpeech.LANG_MISSING_DATA
-                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "This Language is not supported");
-            } else {
-                speakOut();
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
+            if (!f.exists()) {
+                f.mkdirs();
             }
+            tts.setLanguage(new Locale(Language.code[position]));
+            tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav");
+            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {}
 
+                @Override
+                public void onDone(String utteranceId) {
+                    try {
+                        Thread.sleep(5000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Enable the mike button
+                                mikeFAB.setEnabled(true);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(String utteranceId) {}
+            });
         } else {
             Log.e("TTS", "TTS Initialization Failed!");
         }
-
     }
 
     @Override
-    public void onDestroy() {
-        // Don't forget to shutdown tts!
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-        }
-        super.onDestroy();
+    public void onPositiveClick(int position) {
+        this.position = position;
+        new EnglishToTagalog().execute();
     }
 
-    private void speakOut() {
-        tts.speak(speechText, TextToSpeech.QUEUE_FLUSH, null);
+    private class EnglishToTagalog extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog progress = null;
+
+        protected void onError(Exception ex) {
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                translator = new GoogleTranslate(
+                        "AIzaSyDPE9XuoTIMuaDcrRMY4GzSUNBpqmkjuZs");
+
+                Thread.sleep(1000);
+
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
+
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            // start the progress dialog
+            progress = ProgressDialog.show(NRMainActivity.this, null,
+                    "Translating...");
+            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progress.setIndeterminate(true);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            progress.dismiss();
+
+            super.onPostExecute(result);
+            translated();
+            currentLanguageCode = Language.code[position];
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+    }
+
+    public void translated() {
+
+        mikeFAB.setEnabled(false);
+        String translatetotagalog = mImageDetails.getText().toString();
+        String text = translator.translate(translatetotagalog, currentLanguageCode, Language.code[position]);
+        mImageDetails = (TextView) findViewById(R.id.image_details);
+        mImageDetails.setText(text);
+        tts.setLanguage(new Locale(Language.code[position]));
+        speechText = text;
+        onInit(TextToSpeech.SUCCESS);
     }
 }
