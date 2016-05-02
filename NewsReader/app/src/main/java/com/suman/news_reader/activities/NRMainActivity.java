@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,7 +89,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private ImageView               mMainImage;
     private TextToSpeech            tts;
     private FloatingActionButton    galleryFAB;
-    private FloatingActionButton    mikeFAB;
+    private Button                  readTextButton;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle drawerToggle;
@@ -181,11 +182,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
 
-        mikeFAB = (FloatingActionButton) findViewById(R.id.mikeFAB);
-        mikeFAB.setOnClickListener(new View.OnClickListener() {
+        readTextButton = (Button) findViewById(R.id.read_button);
+
+        readTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mikeFAB.isEnabled()) {
+                if (!readTextButton.isEnabled()) {
                     Toast.makeText(getApplicationContext(), "Not enabled as no audio", Toast.LENGTH_LONG).show();
                 }
                 Intent startMusic = new Intent(getApplication(), NRMusicPlayerActivity.class);
@@ -194,8 +196,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 startActivityForResult(startMusic, MUSIC_PLAYER_REQUEST);
             }
         });
-        mikeFAB.setEnabled(false);
-
+        readTextButton.setEnabled(false);
+        readTextButton.setText("Read out loud to me");
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
 
@@ -419,7 +421,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                             @Override
                             public void run() {
                                 // Enable the mike button
-                                mikeFAB.setEnabled(true);
+                                readTextButton.setEnabled(true);
                             }
                         });
                     } catch (InterruptedException e) {
@@ -498,7 +500,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
     public void translated() {
 
-        mikeFAB.setEnabled(false);
+        readTextButton.setEnabled(false);
         String translatetotagalog = mImageDetails.getText().toString();
         String text = translator.translate(translatetotagalog, currentLanguageCode, Language.code[position]);
         mImageDetails = (TextView) findViewById(R.id.image_details);

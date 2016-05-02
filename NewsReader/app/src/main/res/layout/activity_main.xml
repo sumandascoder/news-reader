@@ -29,21 +29,25 @@
 
         <include layout="@layout/content_main" />
 
+        <Button
+            android:id="@+id/read_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/button_shape"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="bottom|center"/>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/galleryFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="center_vertical|end"
             android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/photogallery" />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/mikeFAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/mike" />
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
