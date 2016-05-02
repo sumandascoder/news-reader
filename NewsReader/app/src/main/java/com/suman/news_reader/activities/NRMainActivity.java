@@ -1,14 +1,17 @@
 package com.suman.news_reader.activities;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -26,8 +29,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_reader.older_news.NROlderNewsList;
 import com.suman.news_reader.older_news.OlderNewsFileNamesPOJO;
@@ -88,7 +95,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private TextView                mImageDetails;
     private ImageView               mMainImage;
     private TextToSpeech            tts;
-    private FloatingActionButton    galleryFAB;
     private Button                  readTextButton;
 
     DrawerLayout drawerLayout;
@@ -99,6 +105,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     int position;
     String currentLanguageCode = "en";
     String[] colors = {"#96CC7A", "#EA705D", "#66BBCC"};
+    ProgressBar progressBarImageExtract;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -143,6 +150,11 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                     // Creating the dialog fragment object, which will in turn open the alert dialog window
                     alert.show(manager, "alert_dialog_radio");
                 } **/
+                else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
+                    startGalleryChooser();
+                } else if (menuItem.getItemId() == R.id.nav_capture_image) {
+                    startCamera();
+                }
                 drawerLayout.closeDrawers();
                 return true;
             }
@@ -155,34 +167,21 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setNavigationBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);
+        tintManager.setNavigationBarTintColor(R.color.colorPrimary);
+
         fileID = UUID.randomUUID().toString();
         tts = new TextToSpeech(this, this);
         tts.setLanguage(Locale.US);
 
-        galleryFAB = (FloatingActionButton) findViewById(R.id.galleryFAB);
-        galleryFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(NRMainActivity.this);
-                builder
-                        .setMessage(R.string.dialog_select_prompt)
-                        .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startGalleryChooser();
-                            }
-                        })
-                        .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startCamera();
-                            }
-                        });
-                builder.create().show();
-            }
-        });
-
         readTextButton = (Button) findViewById(R.id.read_button);
+        progressBarImageExtract = (ProgressBar) findViewById(R.id.progressBar);
 
         readTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,7 +203,18 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
         }
+    }
 
+    @TargetApi(19) private void setTranslucentStatus(boolean on) {
+        Window win = getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
     }
 
     public void startGalleryChooser() {
@@ -281,7 +291,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             try {
                 // scale the image to 800px to save on bandwidth
                 Bitmap bitmap = scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 1200);
-                mMainImage.setImageBitmap(bitmap);
+                mMainImage.setBackgroundResource(R.drawable.image_background);
+                mMainImage.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), uri));
                 callCloudVision(bitmap);
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
@@ -298,7 +309,16 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         mImageDetails.setText(R.string.loading_message);
 
         // Do the real work in an async task, because we need to use the network anyway
-        new AsyncTask<Object, Void, String>() {
+        new AsyncTask<Object, Integer, String>() {
+
+            int max = 0;
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressBarImageExtract.setVisibility(View.VISIBLE);
+                progressBarImageExtract.setProgress(0);
+            }
+
             @Override
             protected String doInBackground(Object... params) {
                 try {
@@ -320,9 +340,14 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         // Convert the bitmap to a JPEG
                         // Just in case it's a format that Android understands but Cloud Vision
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
                         byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
+                        progressBarImageExtract.setMax(imageBytes.length);
+                        max = imageBytes.length;
+                        for (int i = 0 ; i < imageBytes.length - 1; i++) {
+                            publishProgress(i);
+                        }
                         // Base64 encode the JPEG
                         base64EncodedImage.encodeContent(imageBytes);
                         annotateImageRequest.setImage(base64EncodedImage);
@@ -357,8 +382,16 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 return "Cloud Vision API request failed. Check logs for details.";
             }
 
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                if(values[0] < max){
+                    progressBarImageExtract.setProgress(values[0]);
+                }
+            }
+
             protected void onPostExecute(String result) {
                 mImageDetails.setText(result);
+                progressBarImageExtract.setVisibility(View.INVISIBLE);
             }
         }.execute();
     }
@@ -384,7 +417,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     }
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        String message = "I found these things:\n\n";
+        String message = "Extracted text from Image:\n\n";
 
         List<EntityAnnotation> textAnnotations = response.getResponses().get(0).getTextAnnotations();
         Log.i("Response", response.toString() + "");

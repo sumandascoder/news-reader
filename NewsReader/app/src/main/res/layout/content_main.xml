@@ -25,23 +25,26 @@
                 android:id="@+id/main_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
+                android:padding="1dp"
                 android:scaleType="fitCenter"/>
 
-            <!-- <ProgressBar
+            <ProgressBar
                 android:id="@+id/progressBar"
-                android:minHeight="20dip"
-                android:maxHeight="20dip"
+                android:minHeight="2dp"
+                android:maxHeight="2dp"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:max="100"
-                style="@android:style/Widget.ProgressBar.Horizontal"/> -->
+                android:visibility="invisible"
+                android:layout_margin="8dp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progressDrawable="@drawable/progressbar_background"/>
 
             <TextView
                 android:id="@+id/image_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="Use the floating action button to select an image."/>
+                android:layout_margin="8dp"
+                android:text="Upload image to extract text."/>
 
         </LinearLayout>
     </ScrollView>

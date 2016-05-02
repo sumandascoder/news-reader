@@ -14,9 +14,19 @@
         -->
 
         <item
+            android:id="@+id/nav_capture_image"
+            android:icon="@drawable/ic_drawer_camera"
+            android:title="Snap It"/>
+
+        <item
+            android:id="@+id/nav_load_from_gallery"
+            android:icon="@drawable/ic_drawer_gallery"
+            android:title="From Gallery"/>
+
+        <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_drawer_about"
-            android:title="About"/>
+            android:title="About Us"/>
 
         <item
             android:id="@+id/nav_contact"
