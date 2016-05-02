@@ -1,7 +1,9 @@
 package com.suman.news_reader.older_news;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
@@ -14,10 +16,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.R;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
 
@@ -51,6 +56,17 @@ public class NROlderNewsList  extends AppCompatActivity{
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setNavigationBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);
+        tintManager.setNavigationBarTintColor(R.color.colorPrimary);
+
         rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayoutOlderNews);
         navView = (NavigationView) findViewById(R.id.navigationOlderNews);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -75,6 +91,18 @@ public class NROlderNewsList  extends AppCompatActivity{
             }
         });
         thumbnailList.setEmptyView(emptyTextView);
+    }
+
+    @TargetApi(19) private void setTranslucentStatus(boolean on) {
+        Window win = getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
     }
 
     @Override
