@@ -3,12 +3,9 @@ package com.suman.news_reader.activities;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -59,12 +56,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_reader.older_news.NROlderNewsList;
 import com.suman.news_reader.older_news.OlderNewsFileNamesPOJO;
-import com.suman.news_reader.utils.CameraUtil;
+import com.suman.news_reader.utils.ImageUtils;
 import com.suman.news_reader.utils.PermissionUtils;
 import com.suman.news_reader.R;
 
@@ -93,6 +89,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private File                    f = new File(dir);
 
     private TextView                mImageDetails;
+    private TextView                imageStatusText;
     private ImageView               mMainImage;
     private TextToSpeech            tts;
     private Button                  readTextButton;
@@ -199,6 +196,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         readTextButton.setText("Read out loud to me");
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
+        imageStatusText = (TextView) findViewById(R.id.image_status);
 
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
@@ -286,13 +284,22 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
     public void uploadImage(Uri uri) {
         if (uri != null) {
             try {
                 // scale the image to 800px to save on bandwidth
-                Bitmap bitmap = scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 1200);
+                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 1200);
                 mMainImage.setBackgroundResource(R.drawable.image_background);
-                mMainImage.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), uri));
+                mMainImage.setImageBitmap(ImageUtils.getRoundedCornerBitmap(bitmap, 20));
                 callCloudVision(bitmap);
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
@@ -306,7 +313,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
     private void callCloudVision(final Bitmap bitmap) throws IOException {
         // Switch text to loading
-        mImageDetails.setText(R.string.loading_message);
+        imageStatusText.setText(R.string.loading_message);
 
         // Do the real work in an async task, because we need to use the network anyway
         new AsyncTask<Object, Integer, String>() {
@@ -345,7 +352,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         byte[] imageBytes = byteArrayOutputStream.toByteArray();
                         progressBarImageExtract.setMax(imageBytes.length);
                         max = imageBytes.length;
-                        for (int i = 0 ; i < imageBytes.length - 1; i++) {
+                        for (int i = 0 ; i < imageBytes.length * 9/10; i++) {
                             publishProgress(i);
                         }
                         // Base64 encode the JPEG
@@ -390,35 +397,16 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
 
             protected void onPostExecute(String result) {
+                progressBarImageExtract.setProgress(max);
+                imageStatusText.setText("Extracted text from Image:");
                 mImageDetails.setText(result);
                 progressBarImageExtract.setVisibility(View.INVISIBLE);
             }
         }.execute();
     }
 
-    public Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
-
-        int originalWidth = bitmap.getWidth();
-        int originalHeight = bitmap.getHeight();
-        int resizedWidth = maxDimension;
-        int resizedHeight = maxDimension;
-
-        if (originalHeight > originalWidth) {
-            resizedHeight = maxDimension;
-            resizedWidth = (int) (resizedHeight * (float) originalWidth / (float) originalHeight);
-        } else if (originalWidth > originalHeight) {
-            resizedWidth = maxDimension;
-            resizedHeight = (int) (resizedWidth * (float) originalHeight / (float) originalWidth);
-        } else if (originalHeight == originalWidth) {
-            resizedHeight = maxDimension;
-            resizedWidth = maxDimension;
-        }
-        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
-    }
-
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        String message = "Extracted text from Image:\n\n";
-
+        String message = "";
         List<EntityAnnotation> textAnnotations = response.getResponses().get(0).getTextAnnotations();
         Log.i("Response", response.toString() + "");
         if (textAnnotations != null) {
@@ -528,7 +516,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
-
     }
 
     public void translated() {

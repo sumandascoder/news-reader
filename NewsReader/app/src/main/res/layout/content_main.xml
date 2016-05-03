@@ -25,8 +25,9 @@
                 android:id="@+id/main_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:padding="1dp"
-                android:scaleType="fitCenter"/>
+                android:padding="3dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"/>
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -36,15 +37,25 @@
                 android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:layout_margin="8dp"
+                android:padding="5dp"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:progressDrawable="@drawable/progressbar_background"/>
+
+            <TextView
+                android:id="@+id/image_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textStyle="bold|normal"
+                android:textSize="15dp"
+                android:text="Upload image to extract text."/>
 
             <TextView
                 android:id="@+id/image_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:text="Upload image to extract text."/>
+                android:layout_margin="15dp"
+                android:text=""/>
 
         </LinearLayout>
     </ScrollView>

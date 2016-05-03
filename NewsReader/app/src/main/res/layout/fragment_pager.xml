@@ -8,15 +8,15 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/section_img"
-            android:layout_width="192dp"
-            android:layout_height="192dp"
+            android:layout_width="300dp"
+            android:layout_height="500dp"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:alpha="0.30"
             android:background="@drawable/ic_media_play"
             android:scaleType="fitCenter" />
 
@@ -38,17 +38,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            tools:text="Page One" />
+            tools:text="Capture Image/ Load Image" />
 
         <TextView
+            android:id="@+id/onboardingText"
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_horizontal_margin"
             android:alpha="0.7"
             android:gravity="center"
-            android:text="Add a long description here about your app's important feature."
-            android:textColor="@android:color/white" />
+            android:text="@string/first_onboarding_page"
+            android:textColor="@android:color/black"
+            android:textSize="18dp"/>
 
 
     </LinearLayout>

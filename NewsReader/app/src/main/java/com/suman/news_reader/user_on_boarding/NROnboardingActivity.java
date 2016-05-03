@@ -1,6 +1,7 @@
 package com.suman.news_reader.user_on_boarding;
 
 import android.animation.ArgbEvaluator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -30,6 +33,8 @@ import android.support.v4.app.FragmentManager;
 import com.suman.news_reader.R;
 import com.suman.news_reader.activities.ImageLaunchActivity;
 import com.suman.news_reader.activities.NRMainActivity;
+
+import org.w3c.dom.Text;
 
 
 /**
@@ -44,6 +49,8 @@ public class NROnboardingActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     ImageButton mNextBtn;
+    private static TextView textBodyOnBoarding;
+    private static TextView sectionLabelOnBoarding;
     Button mSkipBtn, mFinishBtn;
 
     ImageView zero, one, two;
@@ -102,9 +109,9 @@ public class NROnboardingActivity extends AppCompatActivity {
         mViewPager.setCurrentItem(page);
         updateIndicators(page);
 
-        final int color1 = ContextCompat.getColor(this, R.color.cyan);
-        final int color2 = ContextCompat.getColor(this, R.color.orange);
-        final int color3 = ContextCompat.getColor(this, R.color.green);
+        final int color1 = ContextCompat.getColor(this, R.color.colorOnboarding);
+        final int color2 = ContextCompat.getColor(this, R.color.colorOnboarding);
+        final int color3 = ContextCompat.getColor(this, R.color.colorOnboarding);
 
         final int[] colorList = new int[]{color1, color2, color3};
 
@@ -132,12 +139,20 @@ public class NROnboardingActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         mViewPager.setBackgroundColor(color1);
+                        sectionLabelOnBoarding.setText("Capture Image/ Load Image");
+                        textBodyOnBoarding.setText("Snap an image of a newspaper or choose an already existing photo of a " +
+                                "newspaper, receipt, or anything with text on it to make it instantly readable.");
                         break;
                     case 1:
                         mViewPager.setBackgroundColor(color2);
+                        sectionLabelOnBoarding.setText("Older News Library");
+                        textBodyOnBoarding.setText("Enjoy some of your older collectibles of newspaper and text documents." +
+                                "Let the reader read it to you.");
                         break;
                     case 2:
                         mViewPager.setBackgroundColor(color3);
+                        sectionLabelOnBoarding.setText("Play Text");
+                        textBodyOnBoarding.setText("Listen to the text with the music player at own pace.");
                         break;
                 }
 
@@ -192,6 +207,18 @@ public class NROnboardingActivity extends AppCompatActivity {
         }
     }
 
+    @TargetApi(19) private void setTranslucentStatus(boolean on) {
+        Window win = getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -221,7 +248,8 @@ public class NROnboardingActivity extends AppCompatActivity {
 
         ImageView img;
 
-        int[] bgs = new int[]{R.drawable.ic_media_play, R.drawable.ic_media_pause, R.drawable.ic_speaker};
+        int[] bgs = new int[]{R.drawable.ic_onboarding_load_image, R.drawable.ic_onboarding_library,
+                R.drawable.ic_onboarding_music};
 
         public PlaceholderFragment() {
         }
@@ -242,12 +270,11 @@ public class NROnboardingActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_pager, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-
+            sectionLabelOnBoarding = (TextView) rootView.findViewById(R.id.section_label);
+            sectionLabelOnBoarding.setText("Capture Image/ Load Image");
             img = (ImageView) rootView.findViewById(R.id.section_img);
             img.setBackgroundResource(bgs[getArguments().getInt(ARG_SECTION_NUMBER) - 1]);
-
+            textBodyOnBoarding = (TextView)rootView.findViewById(R.id.onboardingText);
 
             return rootView;
         }

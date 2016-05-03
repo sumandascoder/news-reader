@@ -1,8 +1,10 @@
 package com.suman.news_reader.media_controllers;
 
+import android.annotation.TargetApi;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
@@ -14,9 +16,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import java.io.IOException;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.media_controllers.NRAudioControllerView;
 import com.suman.news_reader.media_controllers.NRMediaPlayerControl;
 import com.suman.news_reader.R;
@@ -58,7 +63,14 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
         controller = new NRAudioControllerView(this);
 
         //rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayoutMusic);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setNavigationBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);
+        tintManager.setNavigationBarTintColor(R.color.colorPrimary);
 
         try {
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -135,6 +147,18 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
         player.prepareAsync();
     }
 
+    @TargetApi(19) private void setTranslucentStatus(boolean on) {
+        Window win = getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
+    }
+    
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 
