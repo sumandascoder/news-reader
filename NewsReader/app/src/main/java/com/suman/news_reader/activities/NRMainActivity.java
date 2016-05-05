@@ -16,10 +16,8 @@ import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -58,8 +56,9 @@ import java.util.Locale;
 import java.util.UUID;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
-import com.suman.news_reader.older_news.NROlderNewsList;
-import com.suman.news_reader.older_news.OlderNewsFileNamesPOJO;
+import com.suman.news_reader.navigation_informational.AboutActivity;
+import com.suman.news_reader.navigation_older_news.NROlderNewsList;
+import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
 import com.suman.news_reader.utils.ImageUtils;
 import com.suman.news_reader.utils.PermissionUtils;
 import com.suman.news_reader.R;
@@ -78,6 +77,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     public static final int         CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int         CAMERA_IMAGE_REQUEST = 3;
     public static final int         MUSIC_PLAYER_REQUEST = 4;
+    public static final int         OLDER_NEWS_REQUEST = 5;
 
     private static final String     TAG = NRMainActivity.class.getSimpleName();
     private static final int        GALLERY_IMAGE_REQUEST = 1;
@@ -125,7 +125,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 menuItem.setChecked(true);
                 if (menuItem.getItemId() == R.id.nav_older_news) {
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
-                    startActivity(newsActivity);
+                    startActivityForResult(newsActivity,OLDER_NEWS_REQUEST);
                 }
                 /* else if(menuItem.getItemId() == R.id.nav_lang) {
                     FragmentManager manager = getFragmentManager();
@@ -147,8 +147,27 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 } **/
                 else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     startGalleryChooser();
-                } else if (menuItem.getItemId() == R.id.nav_capture_image) {
+                }
+                else if (menuItem.getItemId() == R.id.nav_capture_image) {
                     startCamera();
+                }
+                else if (menuItem.getItemId() == R.id.nav_about) {
+                    Intent aboutIntent = new Intent(NRMainActivity.this, AboutActivity.class);
+                    aboutIntent.putExtra("about-page", "AboutNewsReader.html");
+                    startActivity(aboutIntent);
+                }
+                else if (menuItem.getItemId() == R.id.nav_contact){
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("message/rfc822");
+                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sumandas.freaky@gmail.com"});
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Say hello or let us know whatsup?");
+                    i.putExtra(Intent.EXTRA_TEXT   , "Please add details");
+                    try {
+                        startActivity(Intent.createChooser(i, "Contact Us"));
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(NRMainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
                 drawerLayout.closeDrawers();
                 return true;
@@ -177,6 +196,9 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         readTextButton = (Button) findViewById(R.id.read_button);
         progressBarImageExtract = (ProgressBar) findViewById(R.id.progressBar);
+        mImageDetails = (TextView) findViewById(R.id.image_details);
+        mMainImage = (ImageView) findViewById(R.id.main_image);
+        imageStatusText = (TextView) findViewById(R.id.image_status);
 
         readTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,9 +210,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
         readTextButton.setText("Read out loud to me");
-        mImageDetails = (TextView) findViewById(R.id.image_details);
-        mMainImage = (ImageView) findViewById(R.id.main_image);
-        imageStatusText = (TextView) findViewById(R.id.image_status);
+
+
 
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
@@ -213,8 +234,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select a photo"),
-                GALLERY_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Select a photo"), GALLERY_IMAGE_REQUEST);
     }
 
     public void startCamera() {
@@ -233,7 +253,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             uploadImage(data.getData());
         }
@@ -242,6 +261,18 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
         else if(requestCode == MUSIC_PLAYER_REQUEST && resultCode == RESULT_OK){
             // DO NOTHING
+        }
+        else if(requestCode == OLDER_NEWS_REQUEST && resultCode == RESULT_OK){
+            Bundle extras = data.getExtras();
+            if (extras != null){
+                String selectedNav  = extras.getString("selectedNav");
+                if(selectedNav.equals("CaptureImage")){
+                    startCamera();
+                }
+                else if (selectedNav.equals("Gallery")){
+                    startGalleryChooser();
+                }
+            }
         }
     }
 
@@ -290,7 +321,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     public void uploadImage(Uri uri) {
         if (uri != null) {
             try {
-                // scale the image to 800px to save on bandwidth
+                // Scale the image to 800px to save on bandwidth
                 Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 1200);
                 mMainImage.setBackgroundResource(R.drawable.image_background);
                 mMainImage.setImageBitmap(ImageUtils.getRoundedCornerBitmap(bitmap, 20));
@@ -311,7 +342,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         // Do the real work in an async task, because we need to use the network anyway
         new AsyncTask<Object, Integer, String>() {
-
             int max = 0;
             @Override
             protected void onPreExecute() {
@@ -327,8 +357,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                     JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
                     Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
-                    builder.setVisionRequestInitializer(new
-                            VisionRequestInitializer(CLOUD_VISION_API_KEY));
+                    builder.setVisionRequestInitializer(new VisionRequestInitializer(CLOUD_VISION_API_KEY));
                     Vision vision = builder.build();
 
                     BatchAnnotateImagesRequest batchAnnotateImagesRequest =
@@ -346,6 +375,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         byte[] imageBytes = byteArrayOutputStream.toByteArray();
                         progressBarImageExtract.setMax(imageBytes.length);
                         max = imageBytes.length;
+
+                        // Keep it going till 9/10th so that value on progress bar proceeds upto a point
                         for (int i = 0 ; i < imageBytes.length * 9/10; i++) {
                             publishProgress(i);
                         }
@@ -353,7 +384,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         base64EncodedImage.encodeContent(imageBytes);
                         annotateImageRequest.setImage(base64EncodedImage);
 
-                        // add the features we want
+                        // Add the features we want
                         annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
                             Feature textDetection = new Feature();
                             textDetection.setType("TEXT_DETECTION");
@@ -399,6 +430,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }.execute();
     }
 
+    // Extract the string from the Google OCR service
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
         String message = "";
         List<EntityAnnotation> textAnnotations = response.getResponses().get(0).getTextAnnotations();
@@ -439,6 +471,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
     }
 
+    // Method so that read is enabled only when file is synthesized, can't rely on onInit
     private void onInitForImage(int status){
         if (status == TextToSpeech.SUCCESS) {
             map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
@@ -464,7 +497,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                // Enable the mike button
+                                // Enable the Read text button
                                 readTextButton.setVisibility(View.VISIBLE);
                             }
                         });
@@ -490,21 +523,14 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private class EnglishToTagalog extends AsyncTask<Void, Void, Void> {
         private ProgressDialog progress = null;
 
-        protected void onError(Exception ex) {
-
-        }
+        protected void onError(Exception ex) {}
 
         @Override
         protected Void doInBackground(Void... params) {
-
             try {
-                translator = new GoogleTranslate(
-                        "AIzaSyDPE9XuoTIMuaDcrRMY4GzSUNBpqmkjuZs");
-
+                translator = new GoogleTranslate("AIzaSyDPE9XuoTIMuaDcrRMY4GzSUNBpqmkjuZs");
                 Thread.sleep(1000);
-
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             return null;
@@ -518,7 +544,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         @Override
         protected void onPreExecute() {
-            // start the progress dialog
+            // Start the progress dialog
             progress = ProgressDialog.show(NRMainActivity.this, null, "Translating...");
             progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progress.setIndeterminate(true);
@@ -528,7 +554,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         @Override
         protected void onPostExecute(Void result) {
             progress.dismiss();
-
             super.onPostExecute(result);
             translated();
             currentLanguageCode = Language.code[position];

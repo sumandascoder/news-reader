@@ -1,14 +1,11 @@
-package com.suman.news_reader.older_news;
+package com.suman.news_reader.navigation_older_news;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by sumansucharitdas on 5/5/16.

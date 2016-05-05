@@ -22,11 +22,15 @@
         <activity android:name=".media_controllers.NRMusicPlayerActivity"
             android:configChanges="orientation|screenSize">
         </activity>
-        <activity android:name=".older_news.NROlderNewsList"
+        <activity android:name=".navigation_older_news.NROlderNewsList"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".user_on_boarding.NROnboardingActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".navigation_informational.AboutActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/AppCompatAlertDialogStyle">
         </activity>
         <activity android:name=".activities.ImageLaunchActivity"
             android:theme="@style/AppTheme.NoActionBar"

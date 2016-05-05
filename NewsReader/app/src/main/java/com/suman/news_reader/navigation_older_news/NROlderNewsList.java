@@ -1,12 +1,12 @@
-package com.suman.news_reader.older_news;
+package com.suman.news_reader.navigation_older_news;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -21,14 +21,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.R;
+import com.suman.news_reader.activities.NRMainActivity;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
-
-import java.io.File;
+import com.suman.news_reader.navigation_informational.AboutActivity;
 
 /**
  * Created by sumansucharitdas on 4/17/16.
@@ -76,6 +76,39 @@ public class NROlderNewsList  extends AppCompatActivity{
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
+                Intent mainActivity = new Intent(NROlderNewsList.this, NRMainActivity.class);
+                if (menuItem.getItemId() == R.id.nav_capture_image) {
+                    mainActivity.putExtra("selectedNav","CaptureImage");
+                }
+                else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
+                    mainActivity.putExtra("selectedNav","Gallery");
+                }
+                else if (menuItem.getItemId() == R.id.nav_about) {
+                    mainActivity.putExtra("selectedNav","About");
+                    setResult(Activity.RESULT_OK, mainActivity);
+                }
+                else if (menuItem.getItemId() == R.id.nav_contact) {
+                    mainActivity.putExtra("selectedNav","Contact");
+                    setResult(Activity.RESULT_OK, mainActivity);
+                }
+                else if (menuItem.getItemId() == R.id.nav_about) {
+                    Intent aboutIntent = new Intent(NROlderNewsList.this, AboutActivity.class);
+                    aboutIntent.putExtra("about-page", "AboutNewsReader.html");
+                    startActivity(aboutIntent);
+                }
+                else if (menuItem.getItemId() == R.id.nav_contact){
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("message/rfc822");
+                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sumandas.freaky@gmail.com"});
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Say hello or let us know whatsup?");
+                    i.putExtra(Intent.EXTRA_TEXT   , "Please add details");
+                    try {
+                        startActivity(Intent.createChooser(i, "Contact Us"));
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(NROlderNewsList.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                finish();
                 drawerLayout.closeDrawers();
                 return true;
             }

@@ -1,4 +1,4 @@
-package com.suman.news_reader.older_news;
+package com.suman.news_reader.navigation_older_news;
 
 import java.util.ArrayList;
 import java.util.List;

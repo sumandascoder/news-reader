@@ -26,12 +26,12 @@
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_drawer_about"
-            android:title="About Us"/>
+            android:title="About News Reader"/>
 
         <item
             android:id="@+id/nav_contact"
             android:icon="@drawable/ic_drawer_contact"
-            android:title="Contact"/>
+            android:title="Contact Us"/>
     </group>
 
 </menu>
