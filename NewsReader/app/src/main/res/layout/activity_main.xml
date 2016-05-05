@@ -43,6 +43,7 @@
                 android:layout_marginRight="8dp"
                 android:background="@drawable/button_shape"
                 android:textColor="@color/colorPrimary"
+                android:visibility="invisible"
                 android:layout_gravity="bottom|center"/>
 
         </android.support.design.widget.CoordinatorLayout>

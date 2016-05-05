@@ -1,6 +1,7 @@
 package com.suman.news_reader.older_news;
 
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -36,11 +38,12 @@ public class NROlderNewsList  extends AppCompatActivity{
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle drawerToggle;
-    private ListView thumbnailList;
+    public static ListView thumbnailList;
     CoordinatorLayout rootLayout;
     NavigationView navView;
-    NewsAdapter newsAdapter;
+    public static NewsAdapter newsAdapter;
     TextView emptyTextView;
+    public static ProgressDialog progressDialogFileDelete;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -77,6 +80,8 @@ public class NROlderNewsList  extends AppCompatActivity{
                 return true;
             }
         });
+
+        progressDialogFileDelete = new ProgressDialog(this);
 
         thumbnailList = (ListView) findViewById(R.id.list_view);
         emptyTextView = (TextView) findViewById(R.id.emptyText);
@@ -138,9 +143,7 @@ public class NROlderNewsList  extends AppCompatActivity{
     }
 
     public void trashMenu(){
-        File dir  = new File(Environment.getExternalStorageDirectory() + "/NewsReader/");
-        for (File file : dir.listFiles()) {
-            //file.delete();
-        }
+        TrashFilesTask trashMenu = new TrashFilesTask();
+        trashMenu.execute();
     }
 }

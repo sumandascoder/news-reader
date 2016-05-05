@@ -1,5 +1,6 @@
 package com.suman.news_reader.older_news;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -24,9 +25,12 @@ public class NewsAdapter extends BaseAdapter {
 
     private static LayoutInflater inflater = null;
     private static Context mainContext;
+    private List<String> fileNames;
 
     public NewsAdapter(Context applicationContext, List<String> thumbnailURLs) {
         mainContext = applicationContext;
+        fileNames = new ArrayList<String>();
+        fileNames = thumbnailURLs;
         inflater = (LayoutInflater) mainContext.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -121,6 +125,12 @@ public class NewsAdapter extends BaseAdapter {
     @Override
     public boolean isEnabled(int position) {
         return true;
+    }
+
+    public void refreshFileNames(List<String> fileNamesNew) {
+        this.fileNames.clear();
+        this.fileNames.addAll(fileNamesNew);
+        notifyDataSetChanged();
     }
 
 }

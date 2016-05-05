@@ -125,9 +125,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 menuItem.setChecked(true);
                 if (menuItem.getItemId() == R.id.nav_older_news) {
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
-                    newsActivity.putExtra("speechText", speechText);
-                    newsActivity.putExtra("fileID", fileID);
-                    startActivityForResult(newsActivity, MUSIC_PLAYER_REQUEST);
+                    startActivity(newsActivity);
                 }
                 /* else if(menuItem.getItemId() == R.id.nav_lang) {
                     FragmentManager manager = getFragmentManager();
@@ -183,16 +181,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         readTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!readTextButton.isEnabled()) {
-                    Toast.makeText(getApplicationContext(), "Not enabled as no audio", Toast.LENGTH_LONG).show();
-                }
                 Intent startMusic = new Intent(getApplication(), NRMusicPlayerActivity.class);
                 startMusic.putExtra("speechText", speechText);
                 startMusic.putExtra("fileID", fileID);
                 startActivityForResult(startMusic, MUSIC_PLAYER_REQUEST);
             }
         });
-        readTextButton.setEnabled(false);
         readTextButton.setText("Read out loud to me");
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
@@ -413,7 +407,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             speechText = "";
             speechText += String.format("%s", textAnnotations.get(0).getDescription());
             message += String.format("%s", textAnnotations.get(0).getDescription());
-            onInit(TextToSpeech.SUCCESS);
+            onInitForImage(TextToSpeech.SUCCESS);
         } else {
             speechText = "I found no text";
             message += "nothing";
@@ -429,7 +423,36 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 f.mkdirs();
             }
             tts.setLanguage(new Locale(Language.code[position]));
-            tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav");
+            if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
+            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {}
+
+                @Override
+                public void onDone(String utteranceId) {}
+
+                @Override
+                public void onError(String utteranceId) {}
+            });
+        } else {
+            Log.e("TTS", "TTS Initialization Failed!");
+        }
+    }
+
+    private void onInitForImage(int status){
+        if (status == TextToSpeech.SUCCESS) {
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
+            if (!f.exists()) {
+                f.mkdirs();
+            }
+            tts.setLanguage(new Locale(Language.code[position]));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    readTextButton.setVisibility(View.INVISIBLE);
+                }
+            });
+            if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
                 public void onStart(String utteranceId) {}
@@ -437,12 +460,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 @Override
                 public void onDone(String utteranceId) {
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 // Enable the mike button
-                                readTextButton.setEnabled(true);
+                                readTextButton.setVisibility(View.VISIBLE);
                             }
                         });
                     } catch (InterruptedException e) {
@@ -496,8 +519,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         @Override
         protected void onPreExecute() {
             // start the progress dialog
-            progress = ProgressDialog.show(NRMainActivity.this, null,
-                    "Translating...");
+            progress = ProgressDialog.show(NRMainActivity.this, null, "Translating...");
             progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progress.setIndeterminate(true);
             super.onPreExecute();
@@ -519,14 +541,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     }
 
     public void translated() {
-
-        readTextButton.setEnabled(false);
         String translatetotagalog = mImageDetails.getText().toString();
         String text = translator.translate(translatetotagalog, currentLanguageCode, Language.code[position]);
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mImageDetails.setText(text);
         tts.setLanguage(new Locale(Language.code[position]));
         speechText = text;
-        onInit(TextToSpeech.SUCCESS);
+        onInitForImage(TextToSpeech.SUCCESS);
     }
 }
