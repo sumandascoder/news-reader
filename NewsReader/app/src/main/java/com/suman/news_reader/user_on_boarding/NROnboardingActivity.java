@@ -29,46 +29,37 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-
 import com.suman.news_reader.R;
 import com.suman.news_reader.activities.ImageLaunchActivity;
-import com.suman.news_reader.activities.NRMainActivity;
-
-import org.w3c.dom.Text;
 
 
 /**
- * Created by sumansucharitdas on 4/30/16.
+ * @author sumansucharitdas
  */
 public class NROnboardingActivity extends AppCompatActivity {
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    private static final String PREFERENCES_FILE = "materialsample_settings";
+    private SectionsPagerAdapter        mSectionsPagerAdapter;
+    private static final String         PREFERENCES_FILE = "materialsample_settings";
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
-    ImageButton mNextBtn;
-    private static TextView textBodyOnBoarding;
-    private static TextView sectionLabelOnBoarding;
-    Button mSkipBtn, mFinishBtn;
+    private ViewPager                   mViewPager;
+    private ImageButton                 mNextBtn;
+    private static TextView             textBodyOnBoarding;
+    private static TextView             sectionLabelOnBoarding;
+    private Button                      mSkipBtn;
+    private Button                      mFinishBtn;
+    private ImageView                   zero, one, two;
+    private ImageView[]                 indicators;
+    private CoordinatorLayout           mCoordinator;
 
-    ImageView zero, one, two;
-    ImageView[] indicators;
-
-    int lastLeftValue = 0;
-
-    CoordinatorLayout mCoordinator;
-
-
-    static final String TAG = "PagerActivity";
-
-    int page = 0;   //  to track page position
+    private int                         lastLeftValue = 0;
+    private static final String         TAG = "PagerActivity";
+    private int                         page = 0;   //  to track page position
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getDecorView().setSystemUiVisibility(
@@ -76,9 +67,7 @@ public class NROnboardingActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black_trans80));
         }
-
         setContentView(R.layout.activity_onboarding);
-
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -122,7 +111,7 @@ public class NROnboardingActivity extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
                 /*
-                color update
+                Color update
                  */
                 int colorUpdate = (Integer) evaluator.evaluate(positionOffset, colorList[position], colorList[position == 2 ? position : position + 1]);
                 mViewPager.setBackgroundColor(colorUpdate);
@@ -133,9 +122,7 @@ public class NROnboardingActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
 
                 page = position;
-
                 updateIndicators(page);
-
                 switch (position) {
                     case 0:
                         mViewPager.setBackgroundColor(color1);
@@ -156,17 +143,12 @@ public class NROnboardingActivity extends AppCompatActivity {
                         break;
                 }
 
-
                 mNextBtn.setVisibility(position == 2 ? View.GONE : View.VISIBLE);
                 mFinishBtn.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
-
-
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
+            public void onPageScrollStateChanged(int state) {}
         });
 
         mNextBtn.setOnClickListener(new View.OnClickListener() {
@@ -232,7 +214,6 @@ public class NROnboardingActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -275,11 +256,8 @@ public class NROnboardingActivity extends AppCompatActivity {
             img = (ImageView) rootView.findViewById(R.id.section_img);
             img.setBackgroundResource(bgs[getArguments().getInt(ARG_SECTION_NUMBER) - 1]);
             textBodyOnBoarding = (TextView)rootView.findViewById(R.id.onboardingText);
-
             return rootView;
         }
-
-
     }
 
     /**
@@ -287,7 +265,6 @@ public class NROnboardingActivity extends AppCompatActivity {
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -298,7 +275,6 @@ public class NROnboardingActivity extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1);
-
         }
 
         @Override
@@ -319,7 +295,6 @@ public class NROnboardingActivity extends AppCompatActivity {
             }
             return null;
         }
-
     }
 
 

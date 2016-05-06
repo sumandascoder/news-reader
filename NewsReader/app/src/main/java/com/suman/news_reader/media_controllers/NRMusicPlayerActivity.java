@@ -20,15 +20,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import java.io.IOException;
-
 import com.readystatesoftware.systembartint.SystemBarTintManager;
-import com.suman.news_reader.media_controllers.NRAudioControllerView;
-import com.suman.news_reader.media_controllers.NRMediaPlayerControl;
 import com.suman.news_reader.R;
 
 /**
- * Created by sumansucharitdas on 4/14/16.
- */
+ * @author sumansucharitdas
+ * */
 public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback, MediaPlayer.OnPreparedListener, NRMediaPlayerControl {
 
     SurfaceView           audioSurface;
@@ -160,9 +157,7 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
     }
     
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-    }
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
     /**
      * ===============================================================================

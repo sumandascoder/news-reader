@@ -1,7 +1,7 @@
 package com.suman.news_reader.media_controllers;
 
 /**
- * Created by sumansucharitdas on 4/16/16.
+ * @author sumansucharitdas
  */
 public interface NRMediaPlayerControl {
     void    start();

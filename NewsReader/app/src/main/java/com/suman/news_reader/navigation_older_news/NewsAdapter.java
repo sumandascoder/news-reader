@@ -2,7 +2,6 @@ package com.suman.news_reader.navigation_older_news;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import com.suman.news_reader.R;
 
 /**
@@ -36,16 +34,10 @@ public class NewsAdapter extends BaseAdapter {
     }
 
     @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-
-    }
+    public void registerDataSetObserver(DataSetObserver observer) {}
 
     @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-
-    }
+    public void unregisterDataSetObserver(DataSetObserver observer) {}
 
     @Override
     public int getCount() {
@@ -94,7 +86,6 @@ public class NewsAdapter extends BaseAdapter {
                 buttonView.setChecked(isChecked);
             }
         });
-
         return convertView;
     }
 
@@ -132,5 +123,4 @@ public class NewsAdapter extends BaseAdapter {
         this.fileNames.addAll(fileNamesNew);
         notifyDataSetChanged();
     }
-
 }

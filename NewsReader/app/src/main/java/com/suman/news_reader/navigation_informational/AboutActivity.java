@@ -7,12 +7,12 @@ import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
-
 import com.suman.news_reader.R;
 
 /**
- * Created by sumansucharitdas on 5/5/16.
- */
+ * @author sumansucharitdas
+ * For HTML webview dialog
+ *  */
 public class AboutActivity extends Activity{
 
     @Override

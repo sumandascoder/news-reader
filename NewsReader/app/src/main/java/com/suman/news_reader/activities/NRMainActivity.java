@@ -31,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -87,35 +86,35 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private HashMap<String, String> map = new HashMap<String, String>();
     private String                  dir = Environment.getExternalStorageDirectory() + "/NewsReader/";
     private File                    f = new File(dir);
+    private int                     position;
+    private String                  currentLanguageCode = "en";
+    private String[]                colors = {"#96CC7A", "#EA705D", "#66BBCC"};
 
+    // UI elements
     private TextView                mImageDetails;
     private TextView                imageStatusText;
     private ImageView               mMainImage;
     private TextToSpeech            tts;
     private Button                  readTextButton;
+    private ProgressBar             progressBarImageExtract;
+    private DrawerLayout            drawerLayout;
+    private ActionBarDrawerToggle   drawerToggle;
+    private NavigationView          navView;
+    private CoordinatorLayout       rootLayout;
 
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle drawerToggle;
-    NavigationView navView;
-    CoordinatorLayout rootLayout;
-    GoogleTranslate translator;
-    int position;
-    String currentLanguageCode = "en";
-    String[] colors = {"#96CC7A", "#EA705D", "#66BBCC"};
-    ProgressBar progressBarImageExtract;
+    // Personal classes
+    private GoogleTranslate         translator;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerToggle = new ActionBarDrawerToggle(NRMainActivity.this, drawerLayout, R.string.app_name, R.string.app_name);
         drawerLayout.setDrawerListener(drawerToggle);
         new OlderNewsFileNamesPOJO();
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         navView = (NavigationView) findViewById(R.id.navigation);
@@ -173,7 +172,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 return true;
             }
         });
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -181,6 +179,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
 
+        // Coloring and maintaining Material design UI
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
@@ -190,16 +189,17 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);
         tintManager.setNavigationBarTintColor(R.color.colorPrimary);
 
-        fileID = UUID.randomUUID().toString();
-        tts = new TextToSpeech(this, this);
-        tts.setLanguage(Locale.US);
-
+        // UI id assignment
         readTextButton = (Button) findViewById(R.id.read_button);
         progressBarImageExtract = (ProgressBar) findViewById(R.id.progressBar);
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
         imageStatusText = (TextView) findViewById(R.id.image_status);
 
+        fileID = UUID.randomUUID().toString();
+        tts = new TextToSpeech(this, this);
+        tts.setLanguage(Locale.US);
+        readTextButton.setText("Read out loud to me");
         readTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -209,15 +209,13 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 startActivityForResult(startMusic, MUSIC_PLAYER_REQUEST);
             }
         });
-        readTextButton.setText("Read out loud to me");
-
-
 
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
         }
     }
 
+    // Set translucent status for api below 19, material design
     @TargetApi(19) private void setTranslucentStatus(boolean on) {
         Window win = getWindow();
         WindowManager.LayoutParams winParams = win.getAttributes();
@@ -228,26 +226,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             winParams.flags &= ~bits;
         }
         win.setAttributes(winParams);
-    }
-
-    public void startGalleryChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select a photo"), GALLERY_IMAGE_REQUEST);
-    }
-
-    public void startCamera() {
-        if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
-            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
-        }
-    }
-
-    public File getCameraFile() {
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        return new File(dir, FILE_NAME);
     }
 
     @Override
@@ -318,6 +296,59 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         super.onDestroy();
     }
 
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
+            if (!f.exists()) {
+                f.mkdirs();
+            }
+            tts.setLanguage(new Locale(Language.code[position]));
+            if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
+            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {}
+
+                @Override
+                public void onDone(String utteranceId) {}
+
+                @Override
+                public void onError(String utteranceId) {}
+            });
+        } else {
+            Log.e("TTS", "TTS Initialization Failed!");
+        }
+    }
+
+    @Override
+    public void onPositiveClick(int position) {
+        this.position = position;
+        new EnglishToTagalog().execute();
+    }
+
+    // Choose image from photo gallery
+    public void startGalleryChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select a photo"), GALLERY_IMAGE_REQUEST);
+    }
+
+    // Start camera to capture image : Also called from NROlderList
+    public void startCamera() {
+        if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
+            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+        }
+    }
+
+    // Get the file for Media
+    public File getCameraFile() {
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        return new File(dir, FILE_NAME);
+    }
+
     public void uploadImage(Uri uri) {
         if (uri != null) {
             try {
@@ -336,6 +367,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
     }
 
+    // Cloud API making the call for OCR
     private void callCloudVision(final Bitmap bitmap) throws IOException {
         // Switch text to loading
         imageStatusText.setText(R.string.loading_message);
@@ -442,33 +474,9 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             onInitForImage(TextToSpeech.SUCCESS);
         } else {
             speechText = "I found no text";
-            message += "nothing";
+            message += "No text";
         }
         return message;
-    }
-
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            tts.setLanguage(new Locale(Language.code[position]));
-            if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
-            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                @Override
-                public void onStart(String utteranceId) {}
-
-                @Override
-                public void onDone(String utteranceId) {}
-
-                @Override
-                public void onError(String utteranceId) {}
-            });
-        } else {
-            Log.e("TTS", "TTS Initialization Failed!");
-        }
     }
 
     // Method so that read is enabled only when file is synthesized, can't rely on onInit
@@ -514,16 +522,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
     }
 
-    @Override
-    public void onPositiveClick(int position) {
-        this.position = position;
-        new EnglishToTagalog().execute();
-    }
-
     private class EnglishToTagalog extends AsyncTask<Void, Void, Void> {
         private ProgressDialog progress = null;
-
-        protected void onError(Exception ex) {}
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -534,7 +534,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 e.printStackTrace();
             }
             return null;
-
         }
 
         @Override
@@ -565,6 +564,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
     }
 
+    // Translation of text to different language
     public void translated() {
         String translatetotagalog = mImageDetails.getText().toString();
         String text = translator.translate(translatetotagalog, currentLanguageCode, Language.code[position]);

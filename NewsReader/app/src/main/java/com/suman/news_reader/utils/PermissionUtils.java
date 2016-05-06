@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-
 import java.util.ArrayList;
 
 /**
@@ -29,12 +28,10 @@ public class PermissionUtils {
             return true;
         } else {
             ActivityCompat.requestPermissions(activity,
-                    permissionsNeeded.toArray(new String[permissionsNeeded.size()]),
-                    requestCode);
+                    permissionsNeeded.toArray(new String[permissionsNeeded.size()]), requestCode);
             return false;
         }
     }
-
 
     public static boolean permissionGranted(int requestCode, int permissionCode, int[] grantResults) {
         if (requestCode == permissionCode) {

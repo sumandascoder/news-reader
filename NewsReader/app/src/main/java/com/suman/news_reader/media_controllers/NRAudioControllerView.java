@@ -17,14 +17,13 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-
 import com.suman.news_reader.R;
-
 import java.lang.ref.WeakReference;
 import java.util.Formatter;
 import java.util.Locale;
 
 /**
+ * @author sumansucharitdas
  * Class contains controller[Play, Pause, Rewind, Fast Forward,, Progress Slider]
  * for Media Player and sync them with the audio. Will have to show image as it is
  * audio file. It is based on Floating Action Button model.
@@ -32,23 +31,18 @@ import java.util.Locale;
  *
  * MediaController will not hide and always stay intact and
  * show the buttons according to these rules:
- * 1) The "previous" and "next" buttons are hidden until setPrevNextListeners()
+ * 1) The "Previous" and "Next" buttons are hidden until setPrevNextListeners()
  *   has been called
- * 2) The "previous" and "next" buttons are visible but disabled if
+ * 2) The "Previous" and "Next" buttons are visible but disabled if
  *   setPrevNextListeners() was called with null listeners
- * 3) The "rewind" and "fast forward" buttons are shown unless requested
+ * 3) The "Rewind" and "Fast forward" buttons are shown unless requested
  *   otherwise by using the MediaController(Context, boolean) constructor
  *   with the boolean set to false
  */
 public class NRAudioControllerView extends FrameLayout {
 
     private static final String TAG = "NRVideoControllerView";
-    private NRMediaPlayerControl  mediaPlayer;
     private Context             localContext;
-    private ViewGroup           viewGroup;
-    private View                parentView;
-    private ProgressBar         mProgress;
-    private TextView            mEndTime, mCurrentTime;
     private boolean             mShowing;
     private boolean             mDragging;
     private static final int    sDefaultTimeout = 3000;
@@ -58,17 +52,26 @@ public class NRAudioControllerView extends FrameLayout {
     private boolean             mUseFastForward;
     private boolean             mFromXml;
     private boolean             mListenersSet;
-    private OnClickListener     mNextListener, mPrevListener;
-    private StringBuilder       mFormatBuilder;
-    private Formatter           mFormatter;
 
+    // UI elements
+    private ViewGroup           viewGroup;
+    private View                parentView;
+    private ProgressBar         mProgress;
+    private TextView            mEndTime, mCurrentTime;
     private ImageButton         mPauseButton;
     private ImageButton         mFfwdButton;
     private ImageButton         mRewButton;
     private ImageButton         mNextButton;
     private ImageButton         mPrevButton;
     private ImageButton         volumeControl;
+
+    private OnClickListener     mNextListener, mPrevListener;
+    private StringBuilder       mFormatBuilder;
+    private Formatter           mFormatter;
     private Handler             mHandler = new MessageHandler(this);
+
+    // Classes
+    private NRMediaPlayerControl  mediaPlayer;
 
     public NRAudioControllerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -76,7 +79,6 @@ public class NRAudioControllerView extends FrameLayout {
         localContext = context;
         mUseFastForward = true;
         mFromXml = true;
-        
         Log.i(TAG, TAG);
     }
 
@@ -84,13 +86,11 @@ public class NRAudioControllerView extends FrameLayout {
         super(context);
         localContext = context;
         mUseFastForward = useFastForward;
-        
         Log.i(TAG, TAG);
     }
 
     public NRAudioControllerView(Context context) {
         this(context, true);
-
         Log.i(TAG, TAG);
     }
 
@@ -117,7 +117,6 @@ public class NRAudioControllerView extends FrameLayout {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
-
         removeAllViews();
         View v = makeControllerView();
         addView(v, frameParams);
@@ -429,7 +428,7 @@ public class NRAudioControllerView extends FrameLayout {
 
     // There are two scenarios that can trigger the seekbar listener to trigger:
     //
-    // The first is the user using the touchpad to adjust the posititon of the
+    // The first is the user using the touchpad to adjust the position of the
     // seekbar's thumb. In this case onStartTrackingTouch is called followed by
     // a number of onProgressChanged notifications, concluded by onStopTrackingTouch.
     // We're setting the field "mDragging" to true for the duration of the dragging
@@ -445,8 +444,10 @@ public class NRAudioControllerView extends FrameLayout {
             mDragging = true;
 
             // By removing these pending progress messages we make sure
-            // that a) we won't update the progress while the user adjusts
-            // the seekbar and b) once the user is done dragging the thumb
+            // that
+            // a) we won't update the progress while the user adjusts
+            // the seekbar and
+            // b) once the user is done dragging the thumb
             // we will post one of these messages to the queue again and
             // this ensures that there will be exactly one message queued up.
             mHandler.removeMessages(SHOW_PROGRESS);

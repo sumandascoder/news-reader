@@ -14,7 +14,6 @@ public class TrashFilesTask extends AsyncTask<Void, Integer, Void> {
 
     private File dir;
 
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -35,7 +34,6 @@ public class TrashFilesTask extends AsyncTask<Void, Integer, Void> {
             file.delete();
             publishProgress(i++);
         }
-
         return null;
     }
 
@@ -49,5 +47,4 @@ public class TrashFilesTask extends AsyncTask<Void, Integer, Void> {
         NROlderNewsList.progressDialogFileDelete.dismiss();
         NROlderNewsList.newsAdapter.refreshFileNames(new ArrayList<String>());
     }
-
 }

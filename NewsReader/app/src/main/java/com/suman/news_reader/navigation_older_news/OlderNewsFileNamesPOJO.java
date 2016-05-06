@@ -1,12 +1,10 @@
 package com.suman.news_reader.navigation_older_news;
 
 import android.os.Environment;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
-
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
 /**
  * The needful Data in ProcessedVineDataValues Object

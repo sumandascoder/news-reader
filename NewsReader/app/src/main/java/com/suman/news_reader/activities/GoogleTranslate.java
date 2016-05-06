@@ -1,4 +1,5 @@
 package com.suman.news_reader.activities;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -21,10 +22,6 @@ public class GoogleTranslate {
 
     public GoogleTranslate(String apiKey) {
         key = apiKey;
-    }
-
-    public GoogleTranslate() {
-
     }
 
     String translate(String text, String from, String to) {
@@ -61,18 +58,15 @@ public class GoogleTranslate {
                             get(0).getAsJsonObject().
                             get("translatedText").getAsString();
                     return translatedText;
-
                 }
             }
 
             if (conn.getResponseCode() != 200) {
                 System.err.println(result);
             }
-
         } catch (IOException | JsonSyntaxException ex) {
             System.err.println(ex.getMessage());
         }
-
         return null;
     }
 }

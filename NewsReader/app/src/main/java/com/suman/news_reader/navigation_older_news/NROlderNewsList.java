@@ -31,19 +31,20 @@ import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_reader.navigation_informational.AboutActivity;
 
 /**
- * Created by sumansucharitdas on 4/17/16.
+ * @author sumansucharitdas
  */
 public class NROlderNewsList  extends AppCompatActivity{
 
+    // UI elements
+    private DrawerLayout            drawerLayout;
+    private ActionBarDrawerToggle   drawerToggle;
+    public static ListView          thumbnailList;
+    private CoordinatorLayout       rootLayout;
+    private NavigationView          navView;
+    private TextView                emptyTextView;
 
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle drawerToggle;
-    public static ListView thumbnailList;
-    CoordinatorLayout rootLayout;
-    NavigationView navView;
-    public static NewsAdapter newsAdapter;
-    TextView emptyTextView;
-    public static ProgressDialog progressDialogFileDelete;
+    public static ProgressDialog    progressDialogFileDelete;
+    public static NewsAdapter       newsAdapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {

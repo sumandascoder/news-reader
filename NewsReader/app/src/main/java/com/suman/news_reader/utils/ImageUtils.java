@@ -9,7 +9,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 /**
- * Created by sumansucharitdas on 5/2/16.
+ * @author sumansucharitdas
  */
 public class ImageUtils {
 
