@@ -18,6 +18,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -44,7 +46,15 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import android.support.v7.app.ActionBarDrawerToggle;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_reader.R;
+import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
+import com.suman.news_reader.navigation_informational.AboutActivity;
+import com.suman.news_reader.navigation_older_news.NROlderNewsList;
+import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
+import com.suman.news_reader.utils.ImageUtils;
+import com.suman.news_reader.utils.PermissionUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -53,14 +63,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
-import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
-import com.suman.news_reader.navigation_informational.AboutActivity;
-import com.suman.news_reader.navigation_older_news.NROlderNewsList;
-import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
-import com.suman.news_reader.utils.ImageUtils;
-import com.suman.news_reader.utils.PermissionUtils;
-import com.suman.news_reader.R;
 
 /**
  * @author ssucharitdas
@@ -166,7 +168,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                     } catch (android.content.ActivityNotFoundException ex) {
                         Toast.makeText(NRMainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                     }
-
                 }
                 drawerLayout.closeDrawers();
                 return true;
@@ -210,8 +211,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
 
+        String s = getIntent().getStringExtra("selectedNav");
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
+        }
+        else if(getIntent().getStringExtra("selectedNav").equals("Gallery")){
+            startGalleryChooser();
         }
     }
 
@@ -303,6 +308,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             if (!f.exists()) {
                 f.mkdirs();
             }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    readTextButton.setVisibility(View.INVISIBLE);
+                }
+            });
             tts.setLanguage(new Locale(Language.code[position]));
             if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
@@ -310,7 +321,14 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 public void onStart(String utteranceId) {}
 
                 @Override
-                public void onDone(String utteranceId) {}
+                public void onDone(String utteranceId) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            readTextButton.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
 
                 @Override
                 public void onError(String utteranceId) {}
@@ -337,8 +355,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     // Start camera to capture image : Also called from NROlderList
     public void startCamera() {
         if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
+            Intent intent = new Intent(this,CameraActivity.class);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(CameraActivity.uriOfFile)));
             startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
         }
     }
@@ -471,55 +489,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             speechText = "";
             speechText += String.format("%s", textAnnotations.get(0).getDescription());
             message += String.format("%s", textAnnotations.get(0).getDescription());
-            onInitForImage(TextToSpeech.SUCCESS);
+            onInit(TextToSpeech.SUCCESS);
         } else {
             speechText = "I found no text";
             message += "No text";
         }
         return message;
-    }
-
-    // Method so that read is enabled only when file is synthesized, can't rely on onInit
-    private void onInitForImage(int status){
-        if (status == TextToSpeech.SUCCESS) {
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            tts.setLanguage(new Locale(Language.code[position]));
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    readTextButton.setVisibility(View.INVISIBLE);
-                }
-            });
-            if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
-            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                @Override
-                public void onStart(String utteranceId) {}
-
-                @Override
-                public void onDone(String utteranceId) {
-                    try {
-                        Thread.sleep(1000);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Enable the Read text button
-                                readTextButton.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(String utteranceId) {}
-            });
-        } else {
-            Log.e("TTS", "TTS Initialization Failed!");
-        }
     }
 
     private class EnglishToTagalog extends AsyncTask<Void, Void, Void> {
@@ -572,6 +547,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         mImageDetails.setText(text);
         tts.setLanguage(new Locale(Language.code[position]));
         speechText = text;
-        onInitForImage(TextToSpeech.SUCCESS);
+        onInit(TextToSpeech.SUCCESS);
     }
 }

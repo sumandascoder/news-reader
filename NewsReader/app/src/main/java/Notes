@@ -1,0 +1,36 @@
+// Method so that read is enabled only when file is synthesized, can't rely on onInit
+    private void onInitForImage(int status){
+        if (status == TextToSpeech.SUCCESS) {
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
+            if (!f.exists()) {
+                f.mkdirs();
+            }
+            tts.setLanguage(new Locale(Language.code[position]));
+            tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav");
+            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {}
+
+                @Override
+                public void onDone(String utteranceId) {
+                    try {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Enable the Read text button
+                                readTextButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(String utteranceId) {}
+            });
+        } else {
+            Log.e("TTS", "TTS Initialization Failed!");
+        }
+    }
