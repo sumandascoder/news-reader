@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Click a news to process"
+        android:textColor="@color/colorAccent" />
+
+    <LinearLayout android:id="@+id/linearLayout1"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_alignBottom="@id/surfaceView">
+        <Button
+            android:id="@+id/useCaptureImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
+            android:text="Use Image"
+            android:background="@color/colorPrimary"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/retake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_toRightOf="@id/useCaptureImage"
+            android:layout_weight="1"
+            android:text="Retake Image"
+            android:background="@color/colorPrimary"
+            android:visibility="invisible"/>
+    </LinearLayout>
+</RelativeLayout>

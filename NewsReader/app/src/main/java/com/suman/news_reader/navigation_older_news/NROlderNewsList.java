@@ -1,7 +1,6 @@
 package com.suman.news_reader.navigation_older_news;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -26,6 +25,7 @@ import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.R;
+import com.suman.news_reader.activities.CameraActivity;
 import com.suman.news_reader.activities.NRMainActivity;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_reader.navigation_informational.AboutActivity;
@@ -60,8 +60,6 @@ public class NROlderNewsList  extends AppCompatActivity{
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
@@ -77,20 +75,21 @@ public class NROlderNewsList  extends AppCompatActivity{
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
-                Intent mainActivity = new Intent(NROlderNewsList.this, NRMainActivity.class);
-                if (menuItem.getItemId() == R.id.nav_capture_image) {
-                    mainActivity.putExtra("selectedNav","CaptureImage");
+                if (menuItem.getItemId() == R.id.nav_older_news){
+                    // Same screen do nothing
+                }
+                else if (menuItem.getItemId() == R.id.nav_capture_image) {
+                    Intent cameraActivity = new Intent(NROlderNewsList.this, CameraActivity.class);
+                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
+                    startActivity(cameraActivity);
+                    finish();
                 }
                 else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
-                    mainActivity.putExtra("selectedNav","Gallery");
-                }
-                else if (menuItem.getItemId() == R.id.nav_about) {
-                    mainActivity.putExtra("selectedNav","About");
-                    setResult(Activity.RESULT_OK, mainActivity);
-                }
-                else if (menuItem.getItemId() == R.id.nav_contact) {
-                    mainActivity.putExtra("selectedNav","Contact");
-                    setResult(Activity.RESULT_OK, mainActivity);
+                    Intent mainActivity = new Intent(NROlderNewsList.this, NRMainActivity.class);
+                    mainActivity.putExtra("selectedNav", "Gallery");
+                    setResult(RESULT_OK);
+                    startActivity(mainActivity);
+                    finish();
                 }
                 else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NROlderNewsList.this, AboutActivity.class);
@@ -109,7 +108,6 @@ public class NROlderNewsList  extends AppCompatActivity{
                         Toast.makeText(NROlderNewsList.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                finish();
                 drawerLayout.closeDrawers();
                 return true;
             }

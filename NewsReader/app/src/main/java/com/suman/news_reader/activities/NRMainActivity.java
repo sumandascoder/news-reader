@@ -18,6 +18,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -44,7 +46,15 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import android.support.v7.app.ActionBarDrawerToggle;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_reader.R;
+import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
+import com.suman.news_reader.navigation_informational.AboutActivity;
+import com.suman.news_reader.navigation_older_news.NROlderNewsList;
+import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
+import com.suman.news_reader.utils.ImageUtils;
+import com.suman.news_reader.utils.PermissionUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -53,14 +63,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
-import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
-import com.suman.news_reader.navigation_informational.AboutActivity;
-import com.suman.news_reader.navigation_older_news.NROlderNewsList;
-import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
-import com.suman.news_reader.utils.ImageUtils;
-import com.suman.news_reader.utils.PermissionUtils;
-import com.suman.news_reader.R;
 
 /**
  * @author ssucharitdas
@@ -166,7 +168,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                     } catch (android.content.ActivityNotFoundException ex) {
                         Toast.makeText(NRMainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                     }
-
                 }
                 drawerLayout.closeDrawers();
                 return true;
@@ -210,8 +211,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
 
+        String s = getIntent().getStringExtra("selectedNav");
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
+        }
+        else if(getIntent().getStringExtra("selectedNav").equals("Gallery")){
+            startGalleryChooser();
         }
     }
 
@@ -337,8 +342,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     // Start camera to capture image : Also called from NROlderList
     public void startCamera() {
         if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
+            Intent intent = new Intent(this,CameraActivity.class);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(CameraActivity.uriOfFile)));
             startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
         }
     }
