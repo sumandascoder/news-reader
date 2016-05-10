@@ -26,6 +26,7 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".media_controllers.NRMusicPlayerActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize">
         </activity>
         <activity android:name=".navigation_older_news.NROlderNewsList"

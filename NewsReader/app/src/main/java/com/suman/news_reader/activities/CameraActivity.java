@@ -147,7 +147,6 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
                 flashCameraButton.setVisibility(View.GONE);
             }
 
-            navView = (NavigationView) findViewById(R.id.navigationCamera);
             navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(MenuItem menuItem) {

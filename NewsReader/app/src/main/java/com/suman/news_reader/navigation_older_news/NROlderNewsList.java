@@ -118,6 +118,7 @@ public class NROlderNewsList  extends AppCompatActivity{
         thumbnailList = (ListView) findViewById(R.id.list_view);
         emptyTextView = (TextView) findViewById(R.id.emptyText);
         newsAdapter = new NewsAdapter(thumbnailList.getContext(), OlderNewsFileNamesPOJO.fileNames);
+        newsAdapter.notifyDataSetChanged();
         thumbnailList.setAdapter(newsAdapter);
         thumbnailList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
