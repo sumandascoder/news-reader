@@ -166,10 +166,7 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
                         setResult(RESULT_OK);
                         releaseCamera();
                         startActivity(mainActivity);
-<<<<<<< HEAD
                         releaseCamera();
-=======
->>>>>>> bitbucket/develop
                         finish();
                     }
                     else if (menuItem.getItemId() == R.id.nav_about) {
@@ -227,13 +224,9 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-<<<<<<< HEAD
         if(drawerToggle != null){
             drawerToggle.syncState();
         }
-=======
-        drawerToggle.syncState();
->>>>>>> bitbucket/develop
     }
 
     @Override
