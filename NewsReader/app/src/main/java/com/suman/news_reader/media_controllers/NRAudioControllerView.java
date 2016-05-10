@@ -300,6 +300,11 @@ public class NRAudioControllerView extends FrameLayout {
             if (duration > 0) {
                 // use long to avoid overflow
                 long pos = 1000L * position / duration;
+                if(pos < 1L){
+                    if (mediaPlayer.isPlaying()) {
+                        mPauseButton.setImageResource(R.drawable.ic_media_pause);
+                    }
+                }
                 mProgress.setProgress( (int) pos);
             }
             int percent = mediaPlayer.getBufferPercentage();

@@ -64,13 +64,11 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                 menuItem.setChecked(true);
                 if (menuItem.getItemId() == R.id.nav_older_news) {
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
-                    player.stop();
                     startActivityForResult(newsActivity, 5);
                 }
                 else if (menuItem.getItemId() == R.id.nav_capture_image) {
                     Intent cameraActivity = new Intent(NRMusicPlayerActivity.this, CameraActivity.class);
                     cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
-                    player.stop();
                     startActivity(cameraActivity);
                     finish();
                 }
@@ -78,7 +76,6 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                     Intent mainActivity = new Intent(NRMusicPlayerActivity.this, NRMainActivity.class);
                     mainActivity.putExtra("selectedNav", "Gallery");
                     setResult(RESULT_OK);
-                    player.stop();
                     startActivity(mainActivity);
                     finish();
                 }
@@ -92,12 +89,14 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                     i.setType("message/rfc822");
                     i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sumandas.freaky@gmail.com"});
                     i.putExtra(Intent.EXTRA_SUBJECT, "Say hello or let us know whatsup?");
-                    i.putExtra(Intent.EXTRA_TEXT   , "Please add details");
+                    i.putExtra(Intent.EXTRA_TEXT, "Please add details");
                     try {
                         startActivity(Intent.createChooser(i, "Contact Us"));
                     } catch (android.content.ActivityNotFoundException ex) {
                         Toast.makeText(NRMusicPlayerActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                     }
+                }
+                if(player.isPlaying()){
                     player.stop();
                 }
                 drawerLayout.closeDrawers();
