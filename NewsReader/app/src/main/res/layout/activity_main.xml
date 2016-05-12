@@ -41,8 +41,7 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:background="@drawable/button_shape"
-                android:textColor="@color/colorPrimary"
+                android:theme="@style/AppCompat.Button"
                 android:visibility="invisible"
                 android:layout_gravity="bottom|center"/>
 

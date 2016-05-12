@@ -32,4 +32,9 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
+    <style name="AppCompat.Button" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:colorButtonNormal">@color/colorOnboarding</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
 </resources>

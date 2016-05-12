@@ -1,9 +1,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
     <FrameLayout
+        android:id="@+id/imageFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1">
@@ -14,8 +16,50 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:background="@color/colorOnboarding"
+            android:background="@color/colorPrimary"
             android:scaleType="fitCenter" />
+
+        <!-- <android.support.design.widget.FloatingActionButton
+            android:id="@+id/flipCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center"
+            android:src="@drawable/ic_camera_onboarding"
+            app:layout_anchor="@id/imageFrame"
+            app:layout_anchorGravity="bottom|center"/> -->
+
     </FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/section_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="30dp"
+            android:text="Your Pocket Assistant"
+            android:textColor="@color/colorOnboarding" />
+
+        <TextView
+            android:id="@+id/section_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:alpha="0.7"
+            android:gravity="center"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="15dp"
+            android:text="@string/first_onboarding_page"
+            android:textColor="@android:color/black" />
+
+
+    </LinearLayout>
 
 </FrameLayout>
