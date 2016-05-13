@@ -4,6 +4,6 @@
     <item
         android:title="Trash"
         android:id="@+id/trash_menu"
-        android:icon="@drawable/ic_trash"
+        android:icon="@mipmap/ic_trash"
         news_reader:showAsAction="ifRoom"/>
 </menu>

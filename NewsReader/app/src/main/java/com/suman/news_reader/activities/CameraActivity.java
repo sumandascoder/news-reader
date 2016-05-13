@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.ErrorCallback;
@@ -60,6 +61,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CameraActivity extends AppCompatActivity implements Callback, OnClickListener {
@@ -165,7 +167,6 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
                         setResult(RESULT_OK);
                         releaseCamera();
                         startActivity(mainActivity);
-                        releaseCamera();
                         finish();
                     }
                     else if (menuItem.getItemId() == R.id.nav_about) {
@@ -208,6 +209,18 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    protected void onPause (){
+        super.onPause();
+        releaseCamera();
+    }
+
+    @Override
+    protected void onStop (){
+        super.onStop();
+        releaseCamera();
     }
 
     @Override
@@ -323,11 +336,21 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
         if (focusModes != null) {
             if (focusModes
                     .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-                params.setFlashMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             }
         }
 
         params.setRotation(rotation);
+        if (params.getMaxNumMeteringAreas() > 0){ // check that metering areas are supported
+            List<Camera.Area> meteringAreas = new ArrayList<Camera.Area>();
+
+            Rect areaRect1 = new Rect(-100, -100, 100, 100);    // specify an area in center of image
+            meteringAreas.add(new Camera.Area(areaRect1, 600)); // set weight to 60%
+            Rect areaRect2 = new Rect(800, -1000, 1000, -800);  // specify an area in upper right of image
+            meteringAreas.add(new Camera.Area(areaRect2, 400)); // set weight to 40%
+            params.setMeteringAreas(meteringAreas);
+        }
+        camera.setParameters(params);
     }
 
     private void showFlashButton(Parameters params) {

@@ -308,12 +308,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             if (!f.exists()) {
                 f.mkdirs();
             }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    readTextButton.setVisibility(View.INVISIBLE);
-                }
-            });
             tts.setLanguage(new Locale(Language.code[position]));
             if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
@@ -403,6 +397,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             @Override
             protected String doInBackground(Object... params) {
                 try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            readTextButton.setVisibility(View.INVISIBLE);
+                        }
+                    });
                     HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
                     JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 

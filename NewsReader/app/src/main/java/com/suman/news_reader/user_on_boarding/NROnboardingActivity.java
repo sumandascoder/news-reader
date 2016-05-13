@@ -17,6 +17,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,12 +53,14 @@ public class NROnboardingActivity extends AppCompatActivity {
 
     private static final String         TAG = "PagerActivity";
     private int                         page = 0;   //  to track page position
+    private GestureDetector mGestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_onboarding);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -108,7 +111,16 @@ public class NROnboardingActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+                int lastIdx = mSectionsPagerAdapter.getCount() - 1;
+                int curItem = mViewPager.getCurrentItem();
+                if(curItem == lastIdx && state == 1) {
+                    finish();
+                    saveSharedSetting(NROnboardingActivity.this, CameraActivity.PREF_USER_FIRST_TIME, "false");
+                    Intent imageCapture = new Intent(getApplicationContext(), CameraActivity.class);
+                    startActivity(imageCapture);
+                }
+            }
         });
 
         mNextBtn.setOnClickListener(new View.OnClickListener() {
@@ -133,9 +145,9 @@ public class NROnboardingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                //  update 1st time pref
                 saveSharedSetting(NROnboardingActivity.this, CameraActivity.PREF_USER_FIRST_TIME, "false");
-
+                Intent imageCapture = new Intent(getApplicationContext(), CameraActivity.class);
+                startActivity(imageCapture);
             }
         });
 
