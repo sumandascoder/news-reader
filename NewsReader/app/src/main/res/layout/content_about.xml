@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+		<TextView
+			android:id="@+id/appHeaderAbout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp"
+			android:textSize="21.3sp"
+			android:textColor="@color/colorPrimary"
+			android:text="@string/app_name"/>
+
+		<TextView
+			android:id="@+id/appDetailAbout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp"
+			android:layout_marginTop="6.7dp"
+            android:layout_below="@id/appHeaderAbout"
+			android:textSize="14sp"
+			android:textColor="@color/processStatus"
+			android:text="@string/app_header_detail"/>
+
+		<TextView
+			android:id="@+id/meetTeamHeaderAbout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp"
+			android:layout_marginTop="20dp"
+            android:layout_below="@id/appDetailAbout"
+            android:textSize="18sp"
+			android:textColor="@color/colorPrimary"
+			android:text="@string/meet_team_header"/>
+
+		<TextView
+			android:id="@+id/meetTeamDetailAbout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp"
+			android:layout_marginTop="6.7dp"
+            android:layout_below="@id/meetTeamHeaderAbout"
+            android:textSize="14sp"
+			android:textColor="@color/processStatus"
+			android:text="@string/meet_team_header_detail"/>
+
+        <TextView
+            android:id="@+id/creditHeaderAbout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/meetTeamDetailAbout"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/credits_header"/>
+
+        <TextView
+            android:id="@+id/creditDetailAbout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="6.7dp"
+            android:layout_below="@id/creditHeaderAbout"
+            android:textSize="14sp"
+            android:textColor="@color/processStatus"
+            android:text="@string/credits_header_detail"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/favFAB"
+            android:src="@mipmap/ic_fab_feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            app:backgroundTint="@color/colorPrimary"
+            android:layout_marginBottom="@dimen/main_activity_layout_margin"
+            android:layout_marginRight="@dimen/main_activity_layout_margin"/>
+	     
+	</RelativeLayout>

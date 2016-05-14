@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -25,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -58,7 +60,9 @@ import com.suman.news_reader.utils.PermissionUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -90,12 +94,13 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private File                    f = new File(dir);
     private int                     position;
     private String                  currentLanguageCode = "en";
-    private String[]                colors = {"#96CC7A", "#EA705D", "#66BBCC"};
 
     // UI elements
-    private TextView                mImageDetails;
+    private TextView                progressStatusText;
     private TextView                imageStatusText;
+    private TextView                imageDetailsText;
     private ImageView               mMainImage;
+    private ImageView               blurImage;
     private TextToSpeech            tts;
     private Button                  readTextButton;
     private ProgressBar             progressBarImageExtract;
@@ -154,7 +159,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 }
                 else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NRMainActivity.this, AboutActivity.class);
-                    aboutIntent.putExtra("about-page", "AboutNewsReader.html");
                     startActivity(aboutIntent);
                 }
                 else if (menuItem.getItemId() == R.id.nav_contact){
@@ -193,9 +197,15 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         // UI id assignment
         readTextButton = (Button) findViewById(R.id.read_button);
         progressBarImageExtract = (ProgressBar) findViewById(R.id.progressBar);
-        mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
+        blurImage = (ImageView) findViewById(R.id.blur_ocr_image);
         imageStatusText = (TextView) findViewById(R.id.image_status);
+        progressStatusText =(TextView) findViewById(R.id.process_status);
+        imageDetailsText = (TextView) findViewById(R.id.image_details);
+
+        progressStatusText.setTypeface(Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf"));
+        imageStatusText.setTypeface(Typeface.createFromAsset(getAssets(), "Roboto-Medium.ttf"));
+        imageDetailsText.setTypeface(Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf"));
 
         fileID = UUID.randomUUID().toString();
         tts = new TextToSpeech(this, this);
@@ -211,7 +221,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
 
-        String s = getIntent().getStringExtra("selectedNav");
         if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
         }
@@ -401,6 +410,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         @Override
                         public void run() {
                             readTextButton.setVisibility(View.INVISIBLE);
+                            progressStatusText.setText("");
+                            imageDetailsText.setText("");
                         }
                     });
                     HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
@@ -466,15 +477,38 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
             @Override
             protected void onProgressUpdate(Integer... values) {
+                readTextButton.setVisibility(View.INVISIBLE);
                 if(values[0] < max){
+                    progressStatusText.setText("Uploading ... ");
                     progressBarImageExtract.setProgress(values[0]);
+                }
+                if (values[0] > max/2){
+                    progressStatusText.setText("Extracting the text ... Sit tight!");
+                    imageStatusText.setVisibility(View.VISIBLE);
+                    imageStatusText.setText("Extracted Text from Image:");
+                    LayoutParams layoutParams = blurImage.getLayoutParams();
+                    final float scale = getResources().getDisplayMetrics().density;
+                    int dpHeightInPx = (int) (140 * scale);
+                    blurImage.getLayoutParams().height = dpHeightInPx;
+                    blurImage.setLayoutParams(layoutParams);
+                    blurImage.setVisibility(View.VISIBLE);
+                }
+                else if((values[0] == max/2)){
+                    progressStatusText.setText("Uploading ... 50%");
+                    imageStatusText.setVisibility(View.INVISIBLE);
+                }
+                if (values[0] < max/2){
+                    imageStatusText.setVisibility(View.INVISIBLE);
                 }
             }
 
             protected void onPostExecute(String result) {
                 progressBarImageExtract.setProgress(max);
+                progressStatusText.setText("Auto saved to News Library. Dated: " + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a").format(new Date()));
                 imageStatusText.setText("Extracted text from Image:");
-                mImageDetails.setText(result);
+                imageDetailsText.setText(result);
+                blurImage.getLayoutParams().height = 0;
+                blurImage.setVisibility(View.INVISIBLE);
                 progressBarImageExtract.setVisibility(View.INVISIBLE);
             }
         }.execute();
@@ -541,10 +575,10 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
     // Translation of text to different language
     public void translated() {
-        String translatetotagalog = mImageDetails.getText().toString();
+        String translatetotagalog = imageDetailsText.getText().toString();
         String text = translator.translate(translatetotagalog, currentLanguageCode, Language.code[position]);
-        mImageDetails = (TextView) findViewById(R.id.image_details);
-        mImageDetails.setText(text);
+        imageDetailsText = (TextView) findViewById(R.id.image_details);
+        imageDetailsText.setText(text);
         tts.setLanguage(new Locale(Language.code[position]));
         speechText = text;
         onInit(TextToSpeech.SUCCESS);

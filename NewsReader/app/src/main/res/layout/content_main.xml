@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                tools:context="com.suman.news_reader.activities.NRMainActivity"
-                tools:showIn="@layout/activity_main">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.suman.news_reader.activities.NRMainActivity"
+    tools:showIn="@layout/activity_main">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -36,26 +36,61 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:visibility="invisible"
-                android:layout_margin="8dp"
+                android:layout_marginLeft="@dimen/main_activity_layout_margin_top"
+                android:layout_marginRight="@dimen/main_activity_layout_margin_top"
+                android:layout_marginTop="@dimen/main_activity_layout_margin_small"
+                android:layout_marginBottom="@dimen/main_activity_layout_margin_small"
                 android:padding="5dp"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:progressDrawable="@drawable/progressbar_background"/>
 
             <TextView
+                android:id="@+id/process_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/main_activity_layout_margin"
+                android:layout_marginRight="@dimen/main_activity_layout_margin"
+                android:layout_marginTop="@dimen/main_activity_layout_margin_top"
+                android:layout_marginBottom="@dimen/main_activity_layout_margin_small"
+                android:textStyle="bold|normal"
+                android:textSize="@dimen/main_activity_text_size_process_status"
+                android:textColor="@color/imageStatus"
+                android:text=""/>
+
+            <TextView
                 android:id="@+id/image_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_marginLeft="@dimen/main_activity_layout_margin"
+                android:layout_marginRight="@dimen/main_activity_layout_margin"
+                android:layout_marginTop="@dimen/main_activity_layout_margin_small"
+                android:layout_marginBottom="@dimen/main_activity_layout_margin_small"
                 android:textStyle="bold|normal"
-                android:textSize="15dp"
+                android:textSize="@dimen/main_activity_text_size_content"
+                android:textColor="@color/processStatus"
                 android:text="Upload image to extract text."/>
 
             <TextView
                 android:id="@+id/image_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_marginLeft="@dimen/main_activity_layout_margin_extra"
+                android:layout_marginRight="@dimen/main_activity_layout_margin_extra"
+                android:layout_marginTop="@dimen/main_activity_layout_margin_small"
+                android:layout_marginBottom="@dimen/main_activity_layout_margin_small"
+                android:textSize="@dimen/main_activity_text_size_content"
+                android:textColor="@color/processStatus"
                 android:text=""/>
+
+            <ImageView
+                android:id="@+id/blur_ocr_image"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:padding="2dp"
+                android:adjustViewBounds="true"
+                android:src="@mipmap/ic_blur_ocr_text"
+                android:visibility="invisible"
+                android:scaleType="fitXY"/>
 
         </LinearLayout>
     </ScrollView>

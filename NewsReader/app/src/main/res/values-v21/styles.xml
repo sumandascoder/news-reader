@@ -5,15 +5,15 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@android:color/black</item>
-        <item name="android:background">@color/colorPrimary</item>
-    </style>
-
     <style name="AppCompat.Button" parent="Widget.AppCompat.Button.Colored">
         <item name="android:colorButtonNormal">@android:color/white</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@color/colorOnboardingBackground</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
 </resources>

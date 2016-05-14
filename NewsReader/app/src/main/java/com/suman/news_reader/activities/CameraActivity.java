@@ -171,7 +171,6 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
                     }
                     else if (menuItem.getItemId() == R.id.nav_about) {
                         Intent aboutIntent = new Intent(CameraActivity.this, AboutActivity.class);
-                        aboutIntent.putExtra("about-page", "AboutNewsReader.html");
                         startActivity(aboutIntent);
                     }
                     else if (menuItem.getItemId() == R.id.nav_contact){
@@ -221,6 +220,11 @@ public class CameraActivity extends AppCompatActivity implements Callback, OnCli
     protected void onStop (){
         super.onStop();
         releaseCamera();
+    }
+
+    @Override
+    protected void onResume (){
+        super.onResume();
     }
 
     @Override

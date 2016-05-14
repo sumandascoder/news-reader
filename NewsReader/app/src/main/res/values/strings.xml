@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">Newshound</string>
+    <string name="app_name">NewsHound</string>
+    <string name="music_player_page_title">NewsHound Music Player</string>
+    <string name="camera_page_title">NewsHound Camera</string>
+    <string name="older_news_page_title">NewsHound Library</string>
+    <string name="about_page_title">About</string>
     <string name="action_settings">Settings</string>
     <string name="image_details_header">Details:</string>
     <string name="image_preview_header">Preview:</string>
@@ -8,8 +12,27 @@
     <string name="dialog_select_prompt">Choose a picture</string>
     <string name="dialog_select_camera">Camera</string>
     <string name="dialog_select_gallery">Gallery</string>
+    <string name="launch_camera">Launch Camera</string>
 
     <string name="image_picker_error">Something is wrong with that image. Pick a different one please.</string>
     <string name="first_onboarding_page">Snap an image of a newspaper or choose an already existing photo of a
         newspaper, receipt, or anything with text on it to make it instantly readable.</string>
+
+    <!-- About Page -->
+    <string name="app_header_detail">Newshound is your everyday pocket assistant.
+                You can capture or load text-based images and Newshound will intelligently extract the text based on OCR technology.
+                Once extracted, you can then instruct Newshound to read it out to you. All your older recording are stored safely on
+                your device.</string>
+    <string name="meet_team_header">Meet the Team</string>
+    <string name="meet_team_header_detail"><b>Suman Sucharit Das</b> - Developer and Designer
+        Suman is a mobile enthusiast and architect. Creative and curious by nature, he aims to build applications to solve day to day
+        problems in users’ life.</string>
+    <string name="credits_header">Credits</string>
+    <string name="credits_header_detail"><b>Pratyush Pandab</b> - UX/UI Design recommendations
+        \n\n Open source images/icon credits:
+            \n- Google Team
+            \n- Icon 54 Team
+            \n- Double J Team
+            \n- Icon Design Team
+            \n- Picol Team</string>
 </resources>

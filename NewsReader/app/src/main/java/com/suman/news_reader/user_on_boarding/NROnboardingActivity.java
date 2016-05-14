@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -13,18 +11,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,8 +38,6 @@ public class NROnboardingActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager                   mViewPager;
-    private ImageButton                 mNextBtn;
-    private Button                      mSkipBtn;
     private Button                      mFinishBtn;
     private CoordinatorLayout           mCoordinator;
     private ImageView[] indicators;
@@ -53,7 +46,8 @@ public class NROnboardingActivity extends AppCompatActivity {
 
     private static final String         TAG = "PagerActivity";
     private int                         page = 0;   //  to track page position
-    private GestureDetector mGestureDetector;
+    public static boolean scrolledEnded = false;
+    public static int curItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +59,7 @@ public class NROnboardingActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black_trans80));
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
         }
 
         // Create the adapter that will return a fragment for each of the three
@@ -79,12 +73,6 @@ public class NROnboardingActivity extends AppCompatActivity {
         indicators = new ImageView[]{mainPage, snapPage, ocrPage, ttsPage};
         indicators[0].setBackgroundResource(R.drawable.indicator_selected);
 
-        mNextBtn = (ImageButton) findViewById(R.id.intro_btn_next);
-        mNextBtn.setImageDrawable(
-                tintMyDrawable(ContextCompat.getDrawable(this, R.drawable.ic_next), R.color.colorPrimary)
-        );
-
-        mSkipBtn = (Button) findViewById(R.id.intro_btn_skip);
         mFinishBtn = (Button) findViewById(R.id.intro_btn_finish);
 
         mCoordinator = (CoordinatorLayout) findViewById(R.id.main_content);
@@ -94,50 +82,33 @@ public class NROnboardingActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         mViewPager.setCurrentItem(page);
-
+        mViewPager.setPageTransformer(true, new NROnboardingTransformer());
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            private boolean enabled;
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                mViewPager.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+                mViewPager.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorOnboardingBackground));
             }
 
             @Override
             public void onPageSelected(int position) {
                 page = position;
-                mViewPager.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),R.color.colorPrimary));
+                mViewPager.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
                 updateIndicators(page);
-                mNextBtn.setVisibility(position == 3 ? View.GONE : View.VISIBLE);
                 mFinishBtn.setVisibility(position == 3 ? View.VISIBLE : View.GONE);
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
                 int lastIdx = mSectionsPagerAdapter.getCount() - 1;
-                int curItem = mViewPager.getCurrentItem();
-                if(curItem == lastIdx && state == 1) {
+                curItem = mViewPager.getCurrentItem();
+                if (curItem == lastIdx && state == 1 && scrolledEnded) {
                     finish();
                     saveSharedSetting(NROnboardingActivity.this, CameraActivity.PREF_USER_FIRST_TIME, "false");
                     Intent imageCapture = new Intent(getApplicationContext(), CameraActivity.class);
                     startActivity(imageCapture);
                 }
-            }
-        });
-
-        mNextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                page += 1;
-                mViewPager.setCurrentItem(page, true);
-            }
-        });
-
-        mSkipBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                saveSharedSetting(NROnboardingActivity.this, CameraActivity.PREF_USER_FIRST_TIME, "false");
-                Intent imageCapture = new Intent(getApplicationContext(), CameraActivity.class);
-                startActivity(imageCapture);
             }
         });
 
@@ -150,7 +121,6 @@ public class NROnboardingActivity extends AppCompatActivity {
                 startActivity(imageCapture);
             }
         });
-
     }
 
     void updateIndicators(int position) {
@@ -186,8 +156,8 @@ public class NROnboardingActivity extends AppCompatActivity {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        int[] bgs = new int[]{R.drawable.ic_onboarding_main, R.drawable.ic_onboarding_snap,
-                R.drawable.ic_onboarding_ocr, R.drawable.ic_onboarding_tts};
+        int[] bgs = new int[]{R.mipmap.ic_onboarding_main, R.mipmap.ic_onboarding_snap,
+                R.mipmap.ic_onboarding_ocr, R.mipmap.ic_onboarding_tts};
 
         public PlaceholderFragment() {}
 
@@ -219,11 +189,12 @@ public class NROnboardingActivity extends AppCompatActivity {
             int width = size.x;
             int height = size.y;
             sectionImage.requestLayout();
-            sectionImage.getLayoutParams().height = height/2;
-            sectionImage.getLayoutParams().width = 3 * width/5;
+            sectionImage.getLayoutParams().height = 3 * height/ 5;
+            sectionImage.getLayoutParams().width = width;
             return rootView;
         }
     }
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -244,7 +215,7 @@ public class NROnboardingActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
+            // Show 4 total pages.
             return 4;
         }
 
@@ -254,22 +225,14 @@ public class NROnboardingActivity extends AppCompatActivity {
                 case 0:
                     return "Your Pocket Assistant";
                 case 1:
-                    return "Snap It";
+                    return "1. Snap It";
                 case 2:
-                    return "Automatic Text Recognition";
+                    return "2. Automatic Text Recognition";
                 case 3:
-                    return "Text to Speech";
+                    return "3. Text to Speech";
             }
             return null;
         }
-    }
-
-
-    public static Drawable tintMyDrawable(Drawable drawable, int color) {
-        drawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(drawable, color);
-        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
-        return drawable;
     }
 
     public static void saveSharedSetting(Context ctx, String settingName, String settingValue) {
@@ -284,11 +247,11 @@ public class NROnboardingActivity extends AppCompatActivity {
             case 0:
                 return "Your Pocket Assistant";
             case 1:
-                return "Snap It";
+                return "1. Snap It";
             case 2:
-                return "Automatic Text Recognition";
+                return "2. Automatic Text Recognition";
             case 3:
-                return "Text to Speech";
+                return "3. Text to Speech";
         }
         return "";
     }

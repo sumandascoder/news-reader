@@ -59,14 +59,6 @@
                 android:layout_marginRight="@dimen/activity_margin_half"
                 android:background="@drawable/indicator_unselected" />
         </LinearLayout>
-        <Button
-            android:id="@+id/intro_btn_skip"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center"
-            android:text="Skip"
-            android:textColor="@android:color/black" />
         <!-- This overlaps the next button in the last slide -->
         <Button
             android:id="@+id/intro_btn_finish"
@@ -74,17 +66,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center"
-            android:text="Finish"
+            android:text="@string/launch_camera"
             android:textColor="@android:color/black"
             android:visibility="gone" />
-        <ImageButton
-            android:id="@+id/intro_btn_next"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:src="@drawable/ic_next"
-            android:tint="@android:color/black" />
     </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

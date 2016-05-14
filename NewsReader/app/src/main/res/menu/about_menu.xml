@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:news_reader="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="Close"
+        android:id="@+id/close_menu"
+        android:icon="@mipmap/ic_close"
+        news_reader:showAsAction="ifRoom"/>
+</menu>

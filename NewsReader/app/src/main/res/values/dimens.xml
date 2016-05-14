@@ -12,19 +12,11 @@
 
     <dimen name="nav_header_text_margin_left">16sp</dimen>
 
-    <dimen name="onboarding_section_header">25sp</dimen>
-    <dimen name="onboarding_section_detail">15sp</dimen>
-    <dimen name="onboarding_layout_dim">8sp</dimen>
-    <dimen name="onboarding_layout_view_dim">2sp</dimen>
-
-    <dimen name="camera_layout_margin">16sp</dimen>
-    <dimen name="camera_layout_margin_content">5sp</dimen>
-
-    <dimen name="main_activity_margin_bottom">10sp</dimen>
-    <dimen name="main_activity_margin">8sp</dimen>
-    <dimen name="main_activity_margin_content">8sp</dimen>
-    <dimen name="main_activity_padding_content">5sp</dimen>
-    <dimen name="main_activity_image_padding_content">2sp</dimen>
+    <!-- Main Activity -->
+    <dimen name="main_activity_text_size_process_status">10.7sp</dimen>
     <dimen name="main_activity_text_size_content">15sp</dimen>
-    <dimen name="main_activity_text_margin_content">15sp</dimen>
+    <dimen name="main_activity_layout_margin_extra">12dp</dimen>
+    <dimen name="main_activity_layout_margin">8dp</dimen>
+    <dimen name="main_activity_layout_margin_small">4dp</dimen>
+    <dimen name="main_activity_layout_margin_top">2dp</dimen>
 </resources>

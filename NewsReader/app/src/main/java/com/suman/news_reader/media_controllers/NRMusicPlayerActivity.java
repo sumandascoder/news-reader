@@ -81,7 +81,6 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                 }
                 else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NRMusicPlayerActivity.this, AboutActivity.class);
-                    aboutIntent.putExtra("about-page", "AboutNewsReader.html");
                     startActivity(aboutIntent);
                 }
                 else if (menuItem.getItemId() == R.id.nav_contact){

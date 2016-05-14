@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/imageFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,6 +17,7 @@
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:background="@color/colorPrimary"
+            android:layout_alignParentTop="true"
             android:scaleType="fitCenter" />
 
         <!-- <android.support.design.widget.FloatingActionButton
@@ -28,7 +29,7 @@
             app:layout_anchor="@id/imageFrame"
             app:layout_anchorGravity="bottom|center"/> -->
 
-    </FrameLayout>
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,9 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="30dp"
+            android:textSize="21.3sp"
             android:text="Your Pocket Assistant"
-            android:textColor="@color/colorOnboarding" />
+            android:textColor="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/section_detail"
@@ -55,9 +56,9 @@
             android:alpha="0.7"
             android:gravity="center"
             style="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="15dp"
+            android:textSize="14sp"
             android:text="@string/first_onboarding_page"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/colorOnboardingDetailsText" />
 
 
     </LinearLayout>

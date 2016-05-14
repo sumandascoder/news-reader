@@ -93,7 +93,6 @@ public class NROlderNewsList  extends AppCompatActivity{
                 }
                 else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NROlderNewsList.this, AboutActivity.class);
-                    aboutIntent.putExtra("about-page", "AboutNewsReader.html");
                     startActivity(aboutIntent);
                 }
                 else if (menuItem.getItemId() == R.id.nav_contact){
