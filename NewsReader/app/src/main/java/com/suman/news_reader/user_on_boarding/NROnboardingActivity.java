@@ -24,7 +24,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.CameraActivity;
+import com.suman.news_reader.activities.FirstPageActionActivity;
+import com.suman.news_reader.activities.NRMainActivity;
 
 
 /**
@@ -105,8 +106,8 @@ public class NROnboardingActivity extends AppCompatActivity {
                 curItem = mViewPager.getCurrentItem();
                 if (curItem == lastIdx && state == 1 && scrolledEnded) {
                     finish();
-                    saveSharedSetting(NROnboardingActivity.this, CameraActivity.PREF_USER_FIRST_TIME, "false");
-                    Intent imageCapture = new Intent(getApplicationContext(), CameraActivity.class);
+                    saveSharedSetting(NROnboardingActivity.this, FirstPageActionActivity.PREF_USER_FIRST_TIME, "false");
+                    Intent imageCapture = new Intent(getApplicationContext(), NRMainActivity.class);
                     startActivity(imageCapture);
                 }
             }
@@ -116,8 +117,8 @@ public class NROnboardingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                saveSharedSetting(NROnboardingActivity.this, CameraActivity.PREF_USER_FIRST_TIME, "false");
-                Intent imageCapture = new Intent(getApplicationContext(), CameraActivity.class);
+                saveSharedSetting(NROnboardingActivity.this, FirstPageActionActivity.PREF_USER_FIRST_TIME, "false");
+                Intent imageCapture = new Intent(getApplicationContext(), FirstPageActionActivity.class);
                 startActivity(imageCapture);
             }
         });

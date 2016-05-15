@@ -3,7 +3,14 @@
     <string name="music_player_page_title">NewsHound Music Player</string>
     <string name="camera_page_title">NewsHound Camera</string>
     <string name="older_news_page_title">NewsHound Library</string>
+
+    <!-- About Page -->
     <string name="about_page_title">About</string>
+    <string name="about_rate_title">Rate NewsHound</string>
+    <string name="about_rate_message">Thank you so much for using the app. If you like the app, would you please rate it?</string>
+    <string name="about_rate_positive">RATE IT NOW</string>
+    <string name="about_rate_negative">NOT NOW</string>
+
     <string name="action_settings">Settings</string>
     <string name="image_details_header">Details:</string>
     <string name="image_preview_header">Preview:</string>
@@ -24,7 +31,7 @@
                 Once extracted, you can then instruct Newshound to read it out to you. All your older recording are stored safely on
                 your device.</string>
     <string name="meet_team_header">Meet the Team</string>
-    <string name="meet_team_header_detail"><b>Suman Sucharit Das</b> - Developer and Designer
+    <string name="meet_team_header_detail"><b>Suman Sucharit Das\n</b> - Developer and Designer
         Suman is a mobile enthusiast and architect. Creative and curious by nature, he aims to build applications to solve day to day
         problems in users’ life.</string>
     <string name="credits_header">Credits</string>

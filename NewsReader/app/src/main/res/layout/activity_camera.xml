@@ -34,33 +34,6 @@
 
             </android.support.design.widget.AppBarLayout>
 
-           <android.support.design.widget.FloatingActionButton
-               android:id="@+id/flipCamera"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_gravity="bottom|right"
-               android:layout_margin="16dp"
-               android:src="@drawable/ic_camera_flip"
-               app:layout_anchorGravity="bottom|left|start" />
-
-           <android.support.design.widget.FloatingActionButton
-               android:id="@+id/captureImage"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_gravity="bottom|center"
-               android:layout_margin="16dp"
-               android:src="@drawable/ic_camera_capture"
-               app:layout_anchorGravity="bottom|center" />
-
-           <android.support.design.widget.FloatingActionButton
-               android:id="@+id/flash"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_gravity="bottom|left"
-               android:layout_margin="16dp"
-               android:src="@drawable/ic_camera_flash"
-               app:layout_anchorGravity="bottom|right|end" />
-
        </android.support.design.widget.CoordinatorLayout>
 
         <android.support.design.widget.NavigationView

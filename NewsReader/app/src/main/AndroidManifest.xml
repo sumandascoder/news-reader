@@ -43,14 +43,13 @@
             android:label="@string/about_page_title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".activities.CameraActivity"
+        <activity android:name=".activities.FirstPageActionActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/camera_page_title"
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

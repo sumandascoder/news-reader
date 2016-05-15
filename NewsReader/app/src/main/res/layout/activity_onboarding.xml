@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|center"
             android:text="@string/launch_camera"
-            android:textColor="@android:color/black"
+            android:textColor="@color/colorPrimary"
             android:visibility="gone" />
     </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

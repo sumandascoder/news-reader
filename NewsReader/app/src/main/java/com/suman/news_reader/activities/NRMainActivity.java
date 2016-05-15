@@ -131,42 +131,39 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 menuItem.setChecked(true);
                 if (menuItem.getItemId() == R.id.nav_older_news) {
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
-                    startActivityForResult(newsActivity,OLDER_NEWS_REQUEST);
+                    startActivityForResult(newsActivity, OLDER_NEWS_REQUEST);
                 }
                 /* else if(menuItem.getItemId() == R.id.nav_lang) {
-                    FragmentManager manager = getFragmentManager();
+                        FragmentManager manager = getFragmentManager();
 
-                    // Instantiating the DialogFragment class
-                    LanguageDialog alert = new LanguageDialog();
+                        // Instantiating the DialogFragment class
+                        LanguageDialog alert = new LanguageDialog();
 
-                    // Creating a bundle object to store the selected item's index
-                    Bundle b  = new Bundle();
+                        // Creating a bundle object to store the selected item's index
+                        Bundle b  = new Bundle();
 
-                    // Storing the selected item's index in the bundle object
-                    b.putInt("position", position);
+                        // Storing the selected item's index in the bundle object
+                        b.putInt("position", position);
 
-                    // Setting the bundle object to the dialog fragment object
-                    alert.setArguments(b);
+                        // Setting the bundle object to the dialog fragment object
+                        alert.setArguments(b);
 
-                    // Creating the dialog fragment object, which will in turn open the alert dialog window
-                    alert.show(manager, "alert_dialog_radio");
-                } **/
+                        // Creating the dialog fragment object, which will in turn open the alert dialog window
+                        alert.show(manager, "alert_dialog_radio");
+                    } **/
                 else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     startGalleryChooser();
-                }
-                else if (menuItem.getItemId() == R.id.nav_capture_image) {
+                } else if (menuItem.getItemId() == R.id.nav_capture_image) {
                     startCamera();
-                }
-                else if (menuItem.getItemId() == R.id.nav_about) {
+                } else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NRMainActivity.this, AboutActivity.class);
                     startActivity(aboutIntent);
-                }
-                else if (menuItem.getItemId() == R.id.nav_contact){
+                } else if (menuItem.getItemId() == R.id.nav_contact) {
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setType("message/rfc822");
-                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sumandas.freaky@gmail.com"});
+                    i.putExtra(Intent.EXTRA_EMAIL, new String[]{"sumandas.freaky@gmail.com"});
                     i.putExtra(Intent.EXTRA_SUBJECT, "Say hello or let us know whatsup?");
-                    i.putExtra(Intent.EXTRA_TEXT   , "Please add details");
+                    i.putExtra(Intent.EXTRA_TEXT, "Please add details");
                     try {
                         startActivity(Intent.createChooser(i, "Contact Us"));
                     } catch (android.content.ActivityNotFoundException ex) {
@@ -200,7 +197,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         mMainImage = (ImageView) findViewById(R.id.main_image);
         blurImage = (ImageView) findViewById(R.id.blur_ocr_image);
         imageStatusText = (TextView) findViewById(R.id.image_status);
-        progressStatusText =(TextView) findViewById(R.id.process_status);
+        progressStatusText = (TextView) findViewById(R.id.process_status);
         imageDetailsText = (TextView) findViewById(R.id.image_details);
 
         progressStatusText.setTypeface(Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf"));
@@ -221,11 +218,14 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
 
-        if(getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null){
+        String s =  getIntent().getStringExtra("selectedNav");
+        if (getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null) {
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
         }
-        else if(getIntent().getStringExtra("selectedNav").equals("Gallery")){
-            startGalleryChooser();
+        else if (getIntent().getStringExtra("selectedNav") != null) {
+            if(getIntent().getStringExtra("selectedNav").equals("Gallery")){
+                startGalleryChooser();
+            }
         }
     }
 
@@ -279,13 +279,17 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+        if(drawerToggle != null){
+            drawerToggle.syncState();
+        }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
+        if(drawerToggle != null){
+            drawerToggle.onConfigurationChanged(newConfig);
+        }
     }
 
     @Override
@@ -299,6 +303,16 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume () {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop (){
+        super.onStop();
     }
 
     @Override
@@ -358,8 +372,11 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     // Start camera to capture image : Also called from NROlderList
     public void startCamera() {
         if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
-            Intent intent = new Intent(this,CameraActivity.class);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(CameraActivity.uriOfFile)));
+//            Intent intent = new Intent(this,CameraActivity.class);
+//            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(CameraActivity.uriOfFile)));
+//            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
             startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
         }
     }
@@ -485,13 +502,15 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 if (values[0] > max/2){
                     progressStatusText.setText("Extracting the text ... Sit tight!");
                     imageStatusText.setVisibility(View.VISIBLE);
-                    imageStatusText.setText("Extracted Text from Image:");
-                    LayoutParams layoutParams = blurImage.getLayoutParams();
-                    final float scale = getResources().getDisplayMetrics().density;
-                    int dpHeightInPx = (int) (140 * scale);
-                    blurImage.getLayoutParams().height = dpHeightInPx;
-                    blurImage.setLayoutParams(layoutParams);
-                    blurImage.setVisibility(View.VISIBLE);
+                    if(values[0] > 8 * max/10){
+                        imageStatusText.setText("Extracted Text from Image:");
+                        LayoutParams layoutParams = blurImage.getLayoutParams();
+                        final float scale = getResources().getDisplayMetrics().density;
+                        int dpHeightInPx = (int) (140 * scale);
+                        blurImage.getLayoutParams().height = dpHeightInPx;
+                        blurImage.setLayoutParams(layoutParams);
+                        blurImage.setVisibility(View.VISIBLE);
+                    }
                 }
                 else if((values[0] == max/2)){
                     progressStatusText.setText("Uploading ... 50%");

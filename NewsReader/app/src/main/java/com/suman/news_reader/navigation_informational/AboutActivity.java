@@ -1,6 +1,7 @@
 package com.suman.news_reader.navigation_informational;
 
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -19,16 +20,15 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
-
+import android.support.v7.app.AlertDialog;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.CameraActivity;
+import com.suman.news_reader.activities.FirstPageActionActivity;
 import com.suman.news_reader.activities.NRMainActivity;
 import com.suman.news_reader.navigation_older_news.NROlderNewsList;
 
 /**
  * @author sumansucharitdas
- * For HTML webview dialog
  *  */
 public class AboutActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
@@ -45,6 +45,8 @@ public class AboutActivity extends AppCompatActivity{
         drawerLayout.setDrawerListener(drawerToggle);
         navView = (NavigationView) findViewById(R.id.navigationAbout);
         favFAB = (FloatingActionButton) findViewById(R.id.favFAB);
+
+        // Show a dialog if meets conditions
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -53,9 +55,13 @@ public class AboutActivity extends AppCompatActivity{
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
                     startActivityForResult(newsActivity, 5);
                 } else if (menuItem.getItemId() == R.id.nav_capture_image) {
-                    Intent cameraActivity = new Intent(AboutActivity.this, CameraActivity.class);
-                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
-                    startActivity(cameraActivity);
+//                    Intent cameraActivity = new Intent(AboutActivity.this, CameraActivity.class);
+//                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
+//                    startActivity(cameraActivity);
+//                    finish();
+                    Intent cameraActivityMain = new Intent(AboutActivity.this, FirstPageActionActivity.class);
+                    cameraActivityMain.putExtra("selectedNav", "CaptureImage");
+                    startActivity(cameraActivityMain);
                     finish();
                 } else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     Intent mainActivity = new Intent(AboutActivity.this, NRMainActivity.class);
@@ -85,10 +91,7 @@ public class AboutActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 // Link to Playstore : http://developer.android.com/distribute/tools/promote/linking.html
-                String url = "market://details?id=com.suman.news_reader";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+                showLocationDialog();
             }
         });
 
@@ -148,5 +151,36 @@ public class AboutActivity extends AppCompatActivity{
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showLocationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AboutActivity.this);
+        builder.setTitle(getString(R.string.about_rate_title));
+        builder.setMessage(getString(R.string.about_rate_message));
+
+        String positiveText = getString(R.string.about_rate_positive);
+        builder.setPositiveButton(positiveText,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String url = "market://details?id=com.suman.news_reader";
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                    }
+                });
+
+        String negativeText = getString(R.string.about_rate_negative);
+        builder.setNegativeButton(negativeText,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        // display dialog
+        dialog.show();
     }
 }

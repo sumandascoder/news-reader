@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.CameraActivity;
+import com.suman.news_reader.activities.FirstPageActionActivity;
 import com.suman.news_reader.activities.NRMainActivity;
 import com.suman.news_reader.navigation_informational.AboutActivity;
 import com.suman.news_reader.navigation_older_news.NROlderNewsList;
@@ -67,9 +67,13 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                     startActivityForResult(newsActivity, 5);
                 }
                 else if (menuItem.getItemId() == R.id.nav_capture_image) {
-                    Intent cameraActivity = new Intent(NRMusicPlayerActivity.this, CameraActivity.class);
-                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
-                    startActivity(cameraActivity);
+//                    Intent cameraActivity = new Intent(NRMusicPlayerActivity.this, CameraActivity.class);
+//                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
+//                    startActivity(cameraActivity);
+//                    finish();
+                    Intent cameraActivityMain = new Intent(NRMusicPlayerActivity.this, FirstPageActionActivity.class);
+                    cameraActivityMain.putExtra("selectedNav", "CaptureImage");
+                    startActivity(cameraActivityMain);
                     finish();
                 }
                 else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {

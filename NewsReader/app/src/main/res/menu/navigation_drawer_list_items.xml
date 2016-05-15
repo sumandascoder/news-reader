@@ -16,7 +16,7 @@
         <item
             android:id="@+id/nav_load_from_gallery"
             android:icon="@drawable/ic_drawer_gallery"
-            android:title="From Gallery"/>
+            android:title="Import from Gallery"/>
 
         <item
             android:id="@+id/nav_older_news"

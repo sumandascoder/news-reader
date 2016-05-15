@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.CameraActivity;
+import com.suman.news_reader.activities.FirstPageActionActivity;
 import com.suman.news_reader.activities.NRMainActivity;
 import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_reader.navigation_informational.AboutActivity;
@@ -79,10 +79,14 @@ public class NROlderNewsList  extends AppCompatActivity{
                     // Same screen do nothing
                 }
                 else if (menuItem.getItemId() == R.id.nav_capture_image) {
-                    Intent cameraActivity = new Intent(NROlderNewsList.this, CameraActivity.class);
-                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
-                    startActivity(cameraActivity);
+                    Intent cameraActivityMain = new Intent(NROlderNewsList.this, FirstPageActionActivity.class);
+                    cameraActivityMain.putExtra("selectedNav", "CaptureImage");
+                    startActivity(cameraActivityMain);
                     finish();
+//                    Intent cameraActivity = new Intent(NROlderNewsList.this, CameraActivity.class);
+//                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
+//                    startActivity(cameraActivity);
+//                    finish();
                 }
                 else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     Intent mainActivity = new Intent(NROlderNewsList.this, NRMainActivity.class);
