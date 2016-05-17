@@ -1,4 +1,4 @@
-package com.suman.news_reader.media_controllers;
+package com.suman.news_hound.media_controllers;
 
 /**
  * @author sumansucharitdas

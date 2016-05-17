@@ -1,4 +1,4 @@
-package com.suman.news_reader.activities;
+package com.suman.news_hound.activities;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

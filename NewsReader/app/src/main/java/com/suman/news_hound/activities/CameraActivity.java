@@ -55,10 +55,10 @@
 //import com.readystatesoftware.systembartint.SystemBarTintManager;
 //import com.suman.news_reader.R;
 //import com.suman.news_reader.media_controllers.FocusSound;
-//import com.suman.news_reader.navigation_informational.AboutActivity;
-//import com.suman.news_reader.navigation_older_news.NROlderNewsList;
-//import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
-//import com.suman.news_reader.user_on_boarding.NROnboardingActivity;
+//import AboutActivity;
+//import NROlderNewsList;
+//import OlderNewsFileNamesPOJO;
+//import NROnboardingActivity;
 //
 //import java.io.ByteArrayOutputStream;
 //import java.io.File;

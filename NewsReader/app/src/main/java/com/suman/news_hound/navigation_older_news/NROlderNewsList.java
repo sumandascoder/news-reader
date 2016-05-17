@@ -1,4 +1,4 @@
-package com.suman.news_reader.navigation_older_news;
+package com.suman.news_hound.navigation_older_news;
 
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
@@ -24,11 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.activities.NRMainActivity;
+import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.FirstPageActionActivity;
-import com.suman.news_reader.activities.NRMainActivity;
-import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
-import com.suman.news_reader.navigation_informational.AboutActivity;
+import com.suman.news_hound.activities.FirstPageActionActivity;
+import com.suman.news_hound.navigation_informational.AboutActivity;
 
 /**
  * @author sumansucharitdas

@@ -1,8 +1,9 @@
-package com.suman.news_reader.activities;
+package com.suman.news_hound.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -18,8 +19,10 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -49,13 +52,13 @@ import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
+import com.suman.news_hound.navigation_informational.AboutActivity;
+import com.suman.news_hound.navigation_older_news.NROlderNewsList;
+import com.suman.news_hound.navigation_older_news.OlderNewsFileNamesPOJO;
+import com.suman.news_hound.utils.ImageUtils;
+import com.suman.news_hound.utils.PermissionUtils;
 import com.suman.news_reader.R;
-import com.suman.news_reader.media_controllers.NRMusicPlayerActivity;
-import com.suman.news_reader.navigation_informational.AboutActivity;
-import com.suman.news_reader.navigation_older_news.NROlderNewsList;
-import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
-import com.suman.news_reader.utils.ImageUtils;
-import com.suman.news_reader.utils.PermissionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -218,7 +221,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             }
         });
 
-        String s =  getIntent().getStringExtra("selectedNav");
         if (getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null) {
             uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
         }
@@ -273,6 +275,34 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
             startCamera();
+        }
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(NRMainActivity.this);
+            builder.setTitle(getString(R.string.camera_permission_title));
+
+            String positiveText = getString(R.string.camera_positive);
+            builder.setPositiveButton(positiveText,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(NRMainActivity.this,
+                                    new String[]{Manifest.permission.CAMERA},
+                                    CAMERA_PERMISSIONS_REQUEST);
+                        }
+                    });
+
+            String negativeText = getString(R.string.camera_negative);
+            builder.setNegativeButton(negativeText,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            // display dialog
+            dialog.show();
         }
     }
 
@@ -331,11 +361,15 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             if (!f.exists()) {
                 f.mkdirs();
             }
+            if(new File(f + "/" + fileID + ".wav").exists()){
+                new File(f + "/" + fileID + ".wav").delete();
+            }
             tts.setLanguage(new Locale(Language.code[position]));
             if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
-                public void onStart(String utteranceId) {}
+                public void onStart(String utteranceId) {
+                }
 
                 @Override
                 public void onDone(String utteranceId) {
@@ -348,7 +382,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 }
 
                 @Override
-                public void onError(String utteranceId) {}
+                public void onError(String utteranceId) {
+                }
             });
         } else {
             Log.e("TTS", "TTS Initialization Failed!");

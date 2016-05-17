@@ -1,4 +1,4 @@
-package com.suman.news_reader.user_on_boarding;
+package com.suman.news_hound.user_on_boarding;
 
 import android.support.v4.view.ViewPager;
 import android.view.View;

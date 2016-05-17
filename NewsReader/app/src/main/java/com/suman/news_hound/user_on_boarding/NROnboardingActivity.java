@@ -1,4 +1,4 @@
-package com.suman.news_reader.user_on_boarding;
+package com.suman.news_hound.user_on_boarding;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,9 +23,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.suman.news_hound.activities.FirstPageActionActivity;
+import com.suman.news_hound.activities.NRMainActivity;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.FirstPageActionActivity;
-import com.suman.news_reader.activities.NRMainActivity;
 
 
 /**

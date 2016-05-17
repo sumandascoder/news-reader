@@ -1,4 +1,4 @@
-package com.suman.news_reader.activities;
+package com.suman.news_hound.activities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -23,11 +23,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.navigation_older_news.NROlderNewsList;
+import com.suman.news_hound.navigation_older_news.OlderNewsFileNamesPOJO;
 import com.suman.news_reader.R;
-import com.suman.news_reader.navigation_informational.AboutActivity;
-import com.suman.news_reader.navigation_older_news.NROlderNewsList;
-import com.suman.news_reader.navigation_older_news.OlderNewsFileNamesPOJO;
-import com.suman.news_reader.user_on_boarding.NROnboardingActivity;
+import com.suman.news_hound.navigation_informational.AboutActivity;
+import com.suman.news_hound.user_on_boarding.NROnboardingActivity;
 
 import java.io.File;
 
@@ -217,5 +217,10 @@ public class FirstPageActionActivity extends AppCompatActivity{
     public File getCameraFile() {
         File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         return new File(dir, FILE_NAME);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

@@ -11,7 +11,7 @@
         android:id="@+id/drawerLayoutOlderNews"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.suman.news_reader.navigation_older_news.NROlderNewsList">
+        tools:context="com.suman.news_hound.navigation_older_news.NROlderNewsList">
 
         <android.support.design.widget.CoordinatorLayout
             android:id="@+id/rootLayoutOlderNews"

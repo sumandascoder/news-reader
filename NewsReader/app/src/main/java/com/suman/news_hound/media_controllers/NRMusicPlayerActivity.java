@@ -1,4 +1,4 @@
-package com.suman.news_reader.media_controllers;
+package com.suman.news_hound.media_controllers;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -26,11 +26,11 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.activities.NRMainActivity;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.FirstPageActionActivity;
-import com.suman.news_reader.activities.NRMainActivity;
-import com.suman.news_reader.navigation_informational.AboutActivity;
-import com.suman.news_reader.navigation_older_news.NROlderNewsList;
+import com.suman.news_hound.activities.FirstPageActionActivity;
+import com.suman.news_hound.navigation_informational.AboutActivity;
+import com.suman.news_hound.navigation_older_news.NROlderNewsList;
 
 import java.io.IOException;
 

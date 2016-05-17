@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/black"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.suman.news_reader.navigation_older_news.NROlderNewsList"
+    tools:context="com.suman.news_hound.navigation_older_news.NROlderNewsList"
     tools:showIn="@layout/activity_older_news">
     <ListView
         android:id="@+id/list_view"

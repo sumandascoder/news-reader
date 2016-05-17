@@ -1,4 +1,4 @@
-package com.suman.news_reader.activities;
+package com.suman.news_hound.activities;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

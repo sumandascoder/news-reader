@@ -1,4 +1,4 @@
-package com.suman.news_reader.navigation_informational;
+package com.suman.news_hound.navigation_informational;
 
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
@@ -22,10 +22,10 @@ import android.view.WindowManager;
 import android.widget.Toast;
 import android.support.v7.app.AlertDialog;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.activities.FirstPageActionActivity;
+import com.suman.news_hound.activities.NRMainActivity;
+import com.suman.news_hound.navigation_older_news.NROlderNewsList;
 import com.suman.news_reader.R;
-import com.suman.news_reader.activities.FirstPageActionActivity;
-import com.suman.news_reader.activities.NRMainActivity;
-import com.suman.news_reader.navigation_older_news.NROlderNewsList;
 
 /**
  * @author sumansucharitdas
@@ -163,7 +163,7 @@ public class AboutActivity extends AppCompatActivity{
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String url = "market://details?id=com.suman.news_reader";
+                        String url = "market://details?id=com.suman.news_hound";
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(url));
                         startActivity(i);

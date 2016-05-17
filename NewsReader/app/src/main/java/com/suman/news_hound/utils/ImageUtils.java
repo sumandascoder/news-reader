@@ -1,4 +1,4 @@
-package com.suman.news_reader.utils;
+package com.suman.news_hound.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
