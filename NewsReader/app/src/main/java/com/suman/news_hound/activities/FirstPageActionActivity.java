@@ -1,6 +1,6 @@
 package com.suman.news_hound.activities;
 
-import android.annotation.TargetApi;
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,16 +18,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.navigation_older_news.NROlderNewsList;
 import com.suman.news_hound.navigation_older_news.OlderNewsFileNamesPOJO;
-import com.suman.news_reader.R;
-import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.user_on_boarding.NROnboardingActivity;
+import com.suman.news_hound.utils.CameraUtils;
+import com.suman.news_hound.utils.PermissionUtils;
+import com.suman.news_hound.utils.ViewUtils;
+import com.suman.news_reader.R;
 
 import java.io.File;
 
@@ -45,10 +46,13 @@ public class FirstPageActionActivity extends AppCompatActivity{
     public static final int         OLDER_NEWS_REQUEST = 5;
     public static final String      PREF_USER_FIRST_TIME = "user_first_time";
     public static final int         CAMERA_IMAGE_REQUEST = 3;
+    public static final int         CAMERA_PERMISSIONS_REQUEST = 2;
     private static final int        GALLERY_IMAGE_REQUEST = 1;
 
     private boolean                 isUserFirstTime;
     private static final String     PREFERENCES_FILE = "materialsample_settings";
+    private CameraUtils             cameraUtils;
+    private ViewUtils               viewUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,9 @@ public class FirstPageActionActivity extends AppCompatActivity{
         isUserFirstTime = Boolean.valueOf(readSharedSetting(FirstPageActionActivity.this, PREF_USER_FIRST_TIME, "true"));
         Intent introIntent = new Intent(FirstPageActionActivity.this, NROnboardingActivity.class);
         introIntent.putExtra(PREF_USER_FIRST_TIME, isUserFirstTime);
+
+        cameraUtils = new CameraUtils();
+        viewUtils = new ViewUtils();
 
         if (isUserFirstTime)
             startActivity(introIntent);
@@ -77,7 +84,7 @@ public class FirstPageActionActivity extends AppCompatActivity{
 
             // Coloring and maintaining Material design UI
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                setTranslucentStatus(true);
+                viewUtils.setTranslucentStatus(true, FirstPageActionActivity.this);
             }
             SystemBarTintManager tintManager = new SystemBarTintManager(this);
             tintManager.setStatusBarTintEnabled(true);
@@ -94,12 +101,7 @@ public class FirstPageActionActivity extends AppCompatActivity{
                         startActivityForResult(newsActivity, OLDER_NEWS_REQUEST);
                     }
                     else if (menuItem.getItemId() == R.id.nav_capture_image) {
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                        File f = new File(dir, FILE_NAME);
-                        uriOfFile = f.getAbsolutePath();
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                        startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+                        startCamera();
                     }
                     else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                         Intent mainActivity = new Intent(FirstPageActionActivity.this, NRMainActivity.class);
@@ -131,19 +133,6 @@ public class FirstPageActionActivity extends AppCompatActivity{
         }
     }
 
-    // Set translucent status for api below 19, material design
-    @TargetApi(19) private void setTranslucentStatus(boolean on) {
-        Window win = getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -162,11 +151,6 @@ public class FirstPageActionActivity extends AppCompatActivity{
     @Override
     protected void onResume () {
         super.onResume();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public static String readSharedSetting(Context ctx, String settingName, String defaultValue) {
@@ -202,6 +186,16 @@ public class FirstPageActionActivity extends AppCompatActivity{
     }
 
     @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    /**
+     * ===============================================================================
+     * |            Need to optimize same across all: DEVICE CAMERA USE              |
+     * ===============================================================================
+     */
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CAMERA_IMAGE_REQUEST && resultCode == RESULT_OK) {
@@ -214,13 +208,25 @@ public class FirstPageActionActivity extends AppCompatActivity{
         }
     }
 
-    public File getCameraFile() {
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        return new File(dir, FILE_NAME);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
+            startCamera();
+        }
+        else {
+            cameraUtils.setCameraPermissionsRequest(FirstPageActionActivity.this);
+        }
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
+    public void startCamera() {
+        if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File f = new File(dir, FILE_NAME);
+            uriOfFile = f.getAbsolutePath();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+        }
     }
 }

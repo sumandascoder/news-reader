@@ -1,9 +1,7 @@
 package com.suman.news_hound.activities;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -19,10 +17,8 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,8 +26,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -56,8 +50,10 @@ import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.navigation_older_news.NROlderNewsList;
 import com.suman.news_hound.navigation_older_news.OlderNewsFileNamesPOJO;
+import com.suman.news_hound.utils.CameraUtils;
 import com.suman.news_hound.utils.ImageUtils;
 import com.suman.news_hound.utils.PermissionUtils;
+import com.suman.news_hound.utils.ViewUtils;
 import com.suman.news_reader.R;
 
 import java.io.ByteArrayOutputStream;
@@ -115,6 +111,9 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     // Personal classes
     private GoogleTranslate         translator;
 
+    private CameraUtils             cameraUtils;
+    private ViewUtils               viewUtils;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +122,9 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         drawerToggle = new ActionBarDrawerToggle(NRMainActivity.this, drawerLayout, R.string.app_name, R.string.app_name);
         drawerLayout.setDrawerListener(drawerToggle);
         new OlderNewsFileNamesPOJO();
+
+        cameraUtils = new CameraUtils();
+        viewUtils = new ViewUtils();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -186,7 +188,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         // Coloring and maintaining Material design UI
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(true);
+            viewUtils.setTranslucentStatus(true, NRMainActivity.this);
         }
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
@@ -231,19 +233,6 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
     }
 
-    // Set translucent status for api below 19, material design
-    @TargetApi(19) private void setTranslucentStatus(boolean on) {
-        Window win = getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -277,32 +266,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             startCamera();
         }
         else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(NRMainActivity.this);
-            builder.setTitle(getString(R.string.camera_permission_title));
-
-            String positiveText = getString(R.string.camera_positive);
-            builder.setPositiveButton(positiveText,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(NRMainActivity.this,
-                                    new String[]{Manifest.permission.CAMERA},
-                                    CAMERA_PERMISSIONS_REQUEST);
-                        }
-                    });
-
-            String negativeText = getString(R.string.camera_negative);
-            builder.setNegativeButton(negativeText,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            // display dialog
-            dialog.show();
+            cameraUtils.setCameraPermissionsRequest(NRMainActivity.this);
         }
     }
 
@@ -426,7 +390,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         if (uri != null) {
             try {
                 // Scale the image to 800px to save on bandwidth
-                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 1200);
+                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 800);
                 mMainImage.setBackgroundResource(R.drawable.image_background);
                 mMainImage.setImageBitmap(ImageUtils.getRoundedCornerBitmap(bitmap, 20));
                 callCloudVision(bitmap);

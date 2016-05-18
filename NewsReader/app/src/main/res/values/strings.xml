@@ -36,15 +36,15 @@
                 Once extracted, you can then instruct Newshound to read it out to you. All your older recording are stored safely on
                 your device.</string>
     <string name="meet_team_header">Meet the Team</string>
-    <string name="meet_team_header_detail"><b>Suman Sucharit Das\n</b> - Developer and Designer
-        Suman is a mobile enthusiast and architect. Creative and curious by nature, he aims to build applications to solve day to day
+    <string name="meet_team_header_detail"><b>Suman Sucharit Das</b> - Developer and Designer
+        \nSuman is a mobile enthusiast and architect. Creative and curious by nature, he aims to build applications to solve day to day
         problems in users’ life.</string>
     <string name="credits_header">Credits</string>
     <string name="credits_header_detail"><b>Pratyush Pandab</b> - UX/UI Design recommendations
-        \n\n Open source images/icon credits:
-            \n- Google Team
-            \n- Icon 54 Team
-            \n- Double J Team
-            \n- Icon Design Team
-            \n- Picol Team</string>
+        \n\nOpen source images/icon credits:
+            \n - Google Team
+            \n - Icon 54 Team
+            \n - Double J Team
+            \n - Icon Design Team
+            \n - Picol Team</string>
 </resources>

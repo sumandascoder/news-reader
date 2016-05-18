@@ -9,21 +9,25 @@
     tools:context="com.suman.news_hound.navigation_older_news.NROlderNewsList"
     tools:showIn="@layout/activity_older_news">
     <ListView
-        android:id="@+id/list_view"
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:numColumns="3"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false"
         android:background="@android:color/white"
         android:verticalSpacing="20dp"
         android:horizontalSpacing="5dp"
         android:descendantFocusability="blocksDescendants">
     </ListView>
     <TextView
-        android:id="@+id/emptyText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:textColor="@color/colorPrimaryDark"
-        android:visibility="gone"
+        style="@android:style/TextAppearance.Large"
+        android:visibility="invisible"
         android:text="No older news" />
 </RelativeLayout>

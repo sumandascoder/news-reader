@@ -1,18 +1,21 @@
 package com.suman.news_hound.navigation_older_news;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.app.Activity;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
+
 import com.suman.news_reader.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Adapter class to have images and text displayed in Viacom Format
@@ -22,10 +25,10 @@ import com.suman.news_reader.R;
 public class NewsAdapter extends BaseAdapter {
 
     private static LayoutInflater inflater = null;
-    private static Context mainContext;
+    private static Activity mainContext;
     private List<String> fileNames;
 
-    public NewsAdapter(Context applicationContext, List<String> thumbnailURLs) {
+    public NewsAdapter(Activity applicationContext, List<String> thumbnailURLs) {
         mainContext = applicationContext;
         fileNames = new ArrayList<String>();
         fileNames = thumbnailURLs;
@@ -121,6 +124,7 @@ public class NewsAdapter extends BaseAdapter {
     public void refreshFileNames(List<String> fileNamesNew) {
         this.fileNames.clear();
         this.fileNames.addAll(fileNamesNew);
-        notifyDataSetChanged();
+        this.notifyDataSetChanged();
+        mainContext.recreate();
     }
 }

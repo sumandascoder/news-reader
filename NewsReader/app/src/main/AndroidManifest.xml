@@ -28,10 +28,12 @@
         <activity android:name="com.suman.news_hound.media_controllers.NRMusicPlayerActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/music_player_page_title"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize">
         </activity>
         <activity android:name="com.suman.news_hound.navigation_older_news.NROlderNewsList"
             android:label="@string/older_news_page_title"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name="com.suman.news_hound.user_on_boarding.NROnboardingActivity"
@@ -41,6 +43,7 @@
         <activity android:name="com.suman.news_hound.navigation_informational.AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/about_page_title"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name="com.suman.news_hound.activities.FirstPageActionActivity"

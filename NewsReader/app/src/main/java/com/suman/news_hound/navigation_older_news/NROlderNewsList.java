@@ -1,11 +1,14 @@
 package com.suman.news_hound.navigation_older_news;
 
-import android.annotation.TargetApi;
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -16,8 +19,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,9 +27,13 @@ import android.widget.Toast;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_hound.activities.NRMainActivity;
 import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
-import com.suman.news_reader.R;
-import com.suman.news_hound.activities.FirstPageActionActivity;
 import com.suman.news_hound.navigation_informational.AboutActivity;
+import com.suman.news_hound.utils.CameraUtils;
+import com.suman.news_hound.utils.PermissionUtils;
+import com.suman.news_hound.utils.ViewUtils;
+import com.suman.news_reader.R;
+
+import java.io.File;
 
 /**
  * @author sumansucharitdas
@@ -46,6 +51,14 @@ public class NROlderNewsList  extends AppCompatActivity{
     public static ProgressDialog    progressDialogFileDelete;
     public static NewsAdapter       newsAdapter;
 
+    // Camera based params
+    public static final int         CAMERA_IMAGE_REQUEST = 3;
+    public static final int         CAMERA_PERMISSIONS_REQUEST = 2;
+    public static String            FILE_NAME = "temp.jpg";
+    public static String            uriOfFile = "";
+
+    private CameraUtils             cameraUtils;
+    private ViewUtils               viewUtils;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,13 +68,16 @@ public class NROlderNewsList  extends AppCompatActivity{
         drawerToggle = new ActionBarDrawerToggle(NROlderNewsList.this, drawerLayout, R.string.app_name, R.string.app_name);
         drawerLayout.setDrawerListener(drawerToggle);
 
+        cameraUtils = new CameraUtils();
+        viewUtils = new ViewUtils();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarOlderNews);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(true);
+            viewUtils.setTranslucentStatus(true, NROlderNewsList.this);
         }
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
@@ -75,36 +91,25 @@ public class NROlderNewsList  extends AppCompatActivity{
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
-                if (menuItem.getItemId() == R.id.nav_older_news){
+                if (menuItem.getItemId() == R.id.nav_older_news) {
                     // Same screen do nothing
-                }
-                else if (menuItem.getItemId() == R.id.nav_capture_image) {
-                    Intent cameraActivityMain = new Intent(NROlderNewsList.this, FirstPageActionActivity.class);
-                    cameraActivityMain.putExtra("selectedNav", "CaptureImage");
-                    startActivity(cameraActivityMain);
-                    finish();
-//                    Intent cameraActivity = new Intent(NROlderNewsList.this, CameraActivity.class);
-//                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
-//                    startActivity(cameraActivity);
-//                    finish();
-                }
-                else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
+                } else if (menuItem.getItemId() == R.id.nav_capture_image) {
+                    startCamera();
+                } else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     Intent mainActivity = new Intent(NROlderNewsList.this, NRMainActivity.class);
                     mainActivity.putExtra("selectedNav", "Gallery");
                     setResult(RESULT_OK);
                     startActivity(mainActivity);
                     finish();
-                }
-                else if (menuItem.getItemId() == R.id.nav_about) {
+                } else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NROlderNewsList.this, AboutActivity.class);
                     startActivity(aboutIntent);
-                }
-                else if (menuItem.getItemId() == R.id.nav_contact){
+                } else if (menuItem.getItemId() == R.id.nav_contact) {
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setType("message/rfc822");
-                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sumandas.freaky@gmail.com"});
+                    i.putExtra(Intent.EXTRA_EMAIL, new String[]{"sumandas.freaky@gmail.com"});
                     i.putExtra(Intent.EXTRA_SUBJECT, "Say hello or let us know whatsup?");
-                    i.putExtra(Intent.EXTRA_TEXT   , "Please add details");
+                    i.putExtra(Intent.EXTRA_TEXT, "Please add details");
                     try {
                         startActivity(Intent.createChooser(i, "Contact Us"));
                     } catch (android.content.ActivityNotFoundException ex) {
@@ -118,9 +123,9 @@ public class NROlderNewsList  extends AppCompatActivity{
 
         progressDialogFileDelete = new ProgressDialog(this);
 
-        thumbnailList = (ListView) findViewById(R.id.list_view);
-        emptyTextView = (TextView) findViewById(R.id.emptyText);
-        newsAdapter = new NewsAdapter(thumbnailList.getContext(), OlderNewsFileNamesPOJO.fileNames);
+        thumbnailList = (ListView) findViewById(android.R.id.list);
+        emptyTextView = (TextView) findViewById(R.id.empty);
+        newsAdapter = new NewsAdapter(NROlderNewsList.this, OlderNewsFileNamesPOJO.fileNames);
         newsAdapter.notifyDataSetChanged();
         thumbnailList.setAdapter(newsAdapter);
         thumbnailList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -131,19 +136,10 @@ public class NROlderNewsList  extends AppCompatActivity{
                 startActivity(startMusic);
             }
         });
-        thumbnailList.setEmptyView(emptyTextView);
-    }
-
-    @TargetApi(19) private void setTranslucentStatus(boolean on) {
-        Window win = getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
+        if (newsAdapter.getCount() == 0) {
+            emptyTextView.setVisibility(View.VISIBLE);
+            thumbnailList.setEmptyView(findViewById(android.R.id.empty));
         }
-        win.setAttributes(winParams);
     }
 
     @Override
@@ -181,5 +177,46 @@ public class NROlderNewsList  extends AppCompatActivity{
     public void trashMenu(){
         TrashFilesTask trashMenu = new TrashFilesTask();
         trashMenu.execute();
+        newsAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * ===============================================================================
+     * |            Need to optimize same across all: DEVICE CAMERA USE              |
+     * ===============================================================================
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == CAMERA_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            Intent mainActivity = new Intent(NROlderNewsList.this, NRMainActivity.class);
+            mainActivity.putExtra("selectedNav","CaptureImage");
+            mainActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(uriOfFile)));
+            setResult(RESULT_OK);
+            startActivity(mainActivity);
+            finish();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
+            startCamera();
+        }
+        else {
+            cameraUtils.setCameraPermissionsRequest(NROlderNewsList.this);
+        }
+    }
+
+    public void startCamera() {
+        if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File f = new File(dir, FILE_NAME);
+            uriOfFile = f.getAbsolutePath();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+        }
     }
 }

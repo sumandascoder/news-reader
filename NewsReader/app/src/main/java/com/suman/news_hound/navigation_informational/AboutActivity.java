@@ -1,31 +1,36 @@
 package com.suman.news_hound.navigation_informational;
 
-import android.annotation.TargetApi;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
-import android.support.v7.app.AlertDialog;
+
 import com.readystatesoftware.systembartint.SystemBarTintManager;
-import com.suman.news_hound.activities.FirstPageActionActivity;
 import com.suman.news_hound.activities.NRMainActivity;
 import com.suman.news_hound.navigation_older_news.NROlderNewsList;
+import com.suman.news_hound.utils.CameraUtils;
+import com.suman.news_hound.utils.PermissionUtils;
+import com.suman.news_hound.utils.ViewUtils;
 import com.suman.news_reader.R;
+
+import java.io.File;
 
 /**
  * @author sumansucharitdas
@@ -35,7 +40,13 @@ public class AboutActivity extends AppCompatActivity{
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navView;
     FloatingActionButton favFAB;
+    private String uriOfFile = "";
+    public static final int         CAMERA_IMAGE_REQUEST = 3;
+    public static final int         CAMERA_PERMISSIONS_REQUEST = 2;
+    public static String            FILE_NAME = "temp.jpg";
 
+    private CameraUtils             cameraUtils;
+    private ViewUtils               viewUtils;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +57,9 @@ public class AboutActivity extends AppCompatActivity{
         navView = (NavigationView) findViewById(R.id.navigationAbout);
         favFAB = (FloatingActionButton) findViewById(R.id.favFAB);
 
+        cameraUtils = new CameraUtils();
+        viewUtils = new ViewUtils();
+
         // Show a dialog if meets conditions
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -55,14 +69,7 @@ public class AboutActivity extends AppCompatActivity{
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
                     startActivityForResult(newsActivity, 5);
                 } else if (menuItem.getItemId() == R.id.nav_capture_image) {
-//                    Intent cameraActivity = new Intent(AboutActivity.this, CameraActivity.class);
-//                    cameraActivity.putExtra("OtherActivity", "NROlderNewsList");
-//                    startActivity(cameraActivity);
-//                    finish();
-                    Intent cameraActivityMain = new Intent(AboutActivity.this, FirstPageActionActivity.class);
-                    cameraActivityMain.putExtra("selectedNav", "CaptureImage");
-                    startActivity(cameraActivityMain);
-                    finish();
+                    startCamera();
                 } else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     Intent mainActivity = new Intent(AboutActivity.this, NRMainActivity.class);
                     mainActivity.putExtra("selectedNav", "Gallery");
@@ -91,7 +98,7 @@ public class AboutActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 // Link to Playstore : http://developer.android.com/distribute/tools/promote/linking.html
-                showLocationDialog();
+                showRateDialog();
             }
         });
 
@@ -100,25 +107,13 @@ public class AboutActivity extends AppCompatActivity{
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(true);
+            viewUtils.setTranslucentStatus(true, AboutActivity.this);
         }
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setNavigationBarTintEnabled(true);
         tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);
         tintManager.setNavigationBarTintColor(R.color.colorPrimary);
-    }
-
-    @TargetApi(19) private void setTranslucentStatus(boolean on) {
-        Window win = getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
     }
 
     @Override
@@ -153,7 +148,7 @@ public class AboutActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    private void showLocationDialog() {
+    private void showRateDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(AboutActivity.this);
         builder.setTitle(getString(R.string.about_rate_title));
         builder.setMessage(getString(R.string.about_rate_message));
@@ -182,5 +177,45 @@ public class AboutActivity extends AppCompatActivity{
         AlertDialog dialog = builder.create();
         // display dialog
         dialog.show();
+    }
+
+    /**
+     * ===============================================================================
+     * |            Need to optimize same across all: DEVICE CAMERA USE              |
+     * ===============================================================================
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == CAMERA_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            Intent mainActivity = new Intent(AboutActivity.this, NRMainActivity.class);
+            mainActivity.putExtra("selectedNav","CaptureImage");
+            mainActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(uriOfFile)));
+            setResult(RESULT_OK);
+            startActivity(mainActivity);
+            finish();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
+            startCamera();
+        }
+        else {
+            cameraUtils.setCameraPermissionsRequest(AboutActivity.this);
+        }
+    }
+
+    public void startCamera() {
+        if (PermissionUtils.requestPermission(this, CAMERA_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File f = new File(dir, FILE_NAME);
+            uriOfFile = f.getAbsolutePath();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+        }
     }
 }

@@ -19,6 +19,7 @@ public class TrashFilesTask extends AsyncTask<Void, Integer, Void> {
         super.onPreExecute();
         NROlderNewsList.progressDialogFileDelete.setProgress(0);
         NROlderNewsList.progressDialogFileDelete.setIndeterminate(false);
+        NROlderNewsList.progressDialogFileDelete.setTitle("Trashing files ...");
         NROlderNewsList.progressDialogFileDelete.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         NROlderNewsList.progressDialogFileDelete.setCancelable(false);
         NROlderNewsList.progressDialogFileDelete.show();
@@ -46,5 +47,6 @@ public class TrashFilesTask extends AsyncTask<Void, Integer, Void> {
     protected void onPostExecute(Void result) {
         NROlderNewsList.progressDialogFileDelete.dismiss();
         NROlderNewsList.newsAdapter.refreshFileNames(new ArrayList<String>());
+        NROlderNewsList.newsAdapter.notifyDataSetChanged();
     }
 }
