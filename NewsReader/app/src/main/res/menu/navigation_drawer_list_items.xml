@@ -21,12 +21,12 @@
         <item
             android:id="@+id/nav_older_news"
             android:icon="@drawable/ic_drawer_news"
-            android:title="News Library"/>
+            android:title="My Library"/>
 
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_drawer_about"
-            android:title="About NewsHound"/>
+            android:title="About GLector"/>
 
         <item
             android:id="@+id/nav_contact"

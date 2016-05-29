@@ -1,18 +1,18 @@
 <resources>
-    <string name="app_name">NewsHound</string>
-    <string name="music_player_page_title">NewsHound Music Player</string>
-    <string name="camera_page_title">NewsHound Camera</string>
-    <string name="older_news_page_title">NewsHound Library</string>
+    <string name="app_name">GLector</string>
+    <string name="music_player_page_title">GLector Music Player</string>
+    <string name="camera_page_title">GLector Camera</string>
+    <string name="older_news_page_title">GLector Library</string>
 
     <!-- About Page -->
     <string name="about_page_title">About</string>
-    <string name="about_rate_title">Rate NewsHound</string>
+    <string name="about_rate_title">Rate GLector</string>
     <string name="about_rate_message">Thank you so much for using the app. If you like the app, would you please rate it?</string>
     <string name="about_rate_positive">RATE IT NOW</string>
     <string name="about_rate_negative">NOT NOW</string>
 
     <!-- Camera Page -->
-    <string name="camera_permission_title">Allow <b>NewsHound</b> to access Camera</string>
+    <string name="camera_permission_title">Allow <b>gLector</b> to access Camera</string>
     <string name="camera_positive">ALLOW </string>
     <string name="camera_negative">DENY</string>
 
@@ -31,9 +31,9 @@
         newspaper, receipt, or anything with text on it to make it instantly readable.</string>
 
     <!-- About Page -->
-    <string name="app_header_detail">Newshound is your everyday pocket assistant.
-                You can capture or load text-based images and Newshound will intelligently extract the text based on OCR technology.
-                Once extracted, you can then instruct Newshound to read it out to you. All your older recording are stored safely on
+    <string name="app_header_detail">GLector is your everyday pocket assistant.
+                You can capture or load text-based images and GLector will intelligently extract the text based on OCR technology.
+                Once extracted, you can then instruct GLector to read it out to you. All your older recording are stored safely on
                 your device.</string>
     <string name="meet_team_header">Meet the Team</string>
     <string name="meet_team_header_detail"><b>Suman Sucharit Das</b> - Developer and Designer

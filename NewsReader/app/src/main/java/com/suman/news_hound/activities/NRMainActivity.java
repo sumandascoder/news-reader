@@ -390,9 +390,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         if (uri != null) {
             try {
                 // Scale the image to 800px to save on bandwidth
-                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 800);
+                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 600);
+                //bitmap = ImageUtils.convertToEdgeDetector(bitmap);
+                //int x = bitmap.getByteCount();
                 mMainImage.setBackgroundResource(R.drawable.image_background);
                 mMainImage.setImageBitmap(ImageUtils.getRoundedCornerBitmap(bitmap, 20));
+                bitmap = ImageUtils.convertColorIntoBlackAndWhiteImage(bitmap);
                 callCloudVision(bitmap);
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
@@ -448,7 +451,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         // Just in case it's a format that Android understands but Cloud Vision
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
                         byte[] imageBytes = byteArrayOutputStream.toByteArray();
                         progressBarImageExtract.setMax(imageBytes.length);
                         max = imageBytes.length;

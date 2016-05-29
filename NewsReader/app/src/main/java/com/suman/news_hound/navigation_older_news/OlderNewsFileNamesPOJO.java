@@ -1,10 +1,11 @@
 package com.suman.news_hound.navigation_older_news;
 
 import android.os.Environment;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The needful Data in ProcessedVineDataValues Object
@@ -20,10 +21,12 @@ public class OlderNewsFileNamesPOJO {
     public OlderNewsFileNamesPOJO(){
         if(files.exists()){
             int count = 0 ;
-            for(File file: files.listFiles()){
-                dateOfCreation.add(count, String.valueOf(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(file.lastModified())));
-                fileNames.add(count, file.getName());
-                count++;
+            if(files.listFiles() != null){
+                for(File file: files.listFiles()){
+                    dateOfCreation.add(count, String.valueOf(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(file.lastModified())));
+                    fileNames.add(count, file.getName());
+                    count++;
+                }
             }
         }
     }
