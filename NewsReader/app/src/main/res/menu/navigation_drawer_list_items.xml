@@ -10,27 +10,27 @@
 
         <item
             android:id="@+id/nav_capture_image"
-            android:icon="@drawable/ic_drawer_camera"
+            android:icon="@mipmap/ic_drawer_photo_camera"
             android:title="Snap It"/>
 
         <item
             android:id="@+id/nav_load_from_gallery"
-            android:icon="@drawable/ic_drawer_gallery"
+            android:icon="@mipmap/ic_drawer_photo_library"
             android:title="Import from Gallery"/>
 
         <item
             android:id="@+id/nav_older_news"
-            android:icon="@drawable/ic_drawer_news"
+            android:icon="@mipmap/ic_drawer_library_music"
             android:title="My Library"/>
 
         <item
             android:id="@+id/nav_about"
-            android:icon="@drawable/ic_drawer_about"
+            android:icon="@mipmap/ic_drawer_info"
             android:title="About GLector"/>
 
         <item
             android:id="@+id/nav_contact"
-            android:icon="@drawable/ic_drawer_contact"
+            android:icon="@mipmap/ic_drawer_contact_mail"
             android:title="Contact Us"/>
     </group>
 

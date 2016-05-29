@@ -27,7 +27,7 @@
                 android:layout_height="200dp"
                 android:padding="2dp"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"/>
+                android:scaleType="fitCenter"/>
 
             <ProgressBar
                 android:id="@+id/progressBar"
