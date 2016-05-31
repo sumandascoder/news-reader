@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 
-import com.suman.news_reader.R;
+import com.suman.news_hound.R;
 
 /**
  * Created by sumansucharitdas on 5/17/16.

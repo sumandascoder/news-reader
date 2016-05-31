@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.R;
 import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.navigation_older_news.NROlderNewsList;
 import com.suman.news_hound.navigation_older_news.OlderNewsFileNamesPOJO;
@@ -28,7 +29,6 @@ import com.suman.news_hound.user_on_boarding.NROnboardingActivity;
 import com.suman.news_hound.utils.CameraUtils;
 import com.suman.news_hound.utils.PermissionUtils;
 import com.suman.news_hound.utils.ViewUtils;
-import com.suman.news_reader.R;
 
 import java.io.File;
 

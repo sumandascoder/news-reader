@@ -17,7 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import com.suman.news_reader.R;
+
+import com.suman.news_hound.R;
+
 import java.lang.ref.WeakReference;
 import java.util.Formatter;
 import java.util.Locale;

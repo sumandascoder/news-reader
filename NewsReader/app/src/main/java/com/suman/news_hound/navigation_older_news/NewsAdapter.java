@@ -12,7 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.suman.news_reader.R;
+import com.suman.news_hound.R;
 
 import java.util.ArrayList;
 import java.util.List;

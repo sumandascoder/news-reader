@@ -24,7 +24,7 @@
     <string name="dialog_select_prompt">Choose a picture</string>
     <string name="dialog_select_camera">Camera</string>
     <string name="dialog_select_gallery">Gallery</string>
-    <string name="launch_camera">Launch Camera</string>
+    <string name="launch_camera">Get Started</string>
 
     <string name="image_picker_error">Something is wrong with that image. Pick a different one please.</string>
     <string name="first_onboarding_page">Snap an image of a newspaper or choose an already existing photo of a
@@ -47,4 +47,7 @@
             \n - Double J Team
             \n - Icon Design Team
             \n - Picol Team</string>
+
+    <!-- Facebook -->
+    <string name="facebook_app_id">1018169818273175</string>
 </resources>

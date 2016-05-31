@@ -23,10 +23,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.suman.news_hound.R;
 import com.suman.news_hound.activities.FirstPageActionActivity;
 import com.suman.news_hound.activities.NRMainActivity;
-import com.suman.news_reader.R;
-
 
 /**
  * @author sumansucharitdas

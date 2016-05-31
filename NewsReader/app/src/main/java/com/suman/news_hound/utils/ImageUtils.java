@@ -10,6 +10,11 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.graphics.Matrix;
+
+import java.io.IOException;
 
 /**
  * @author sumansucharitdas
@@ -50,7 +55,14 @@ public class ImageUtils {
         return output;
     }
 
-    public static Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
+    /**
+     *
+     * @param bitmap The source bitmap
+     * @param maxDimension Pixel dimension to be used
+     * @param orientation Set the orientation
+     * @return
+     */
+    public static Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension, int orientation) {
 
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
@@ -67,9 +79,42 @@ public class ImageUtils {
             resizedHeight = maxDimension;
             resizedWidth = maxDimension;
         }
-        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
+
+        Matrix matrix = new Matrix();
+        if (orientation == 6) {
+            matrix.postRotate(90);
+        }
+        else if (orientation == 3) {
+            matrix.postRotate(180);
+        }
+        else if (orientation == 8) {
+            matrix.postRotate(270);
+        }
+        // Create the scaled bitmap image
+        Bitmap b = Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
+        return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
     }
 
+    /**
+     * Set the orientation for the image file
+     * @param uri File path
+     * @return
+     */
+    public static int setOrientation(Uri uri){
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(uri.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+    }
+
+    /**
+     * Convert the image to Gray scale
+     * @param bmpOriginal
+     * @return
+     */
     public static Bitmap convertColorIntoBlackAndWhiteImage(Bitmap bmpOriginal) {
         int width, height;
         height = bmpOriginal.getHeight();
@@ -92,6 +137,11 @@ public class ImageUtils {
         return bmpGrayscale;
     }
 
+    /**
+     * Convert image to edge detected image
+     * @param src The source bitmap
+     * @return
+     */
     public static Bitmap convertToEdgeDetector(Bitmap src){
         Bitmap dest = Bitmap.createBitmap(
                 src.getWidth(), src.getHeight(), src.getConfig());

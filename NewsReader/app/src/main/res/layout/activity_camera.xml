@@ -11,7 +11,7 @@
         android:id="@+id/drawerLayoutCamera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.suman.news_reader.activities.CameraActivity">
+        tools:context="com.suman.news_hound.activities.CameraActivity">
 
        <android.support.design.widget.CoordinatorLayout
             android:id="@+id/rootLayoutCamera"

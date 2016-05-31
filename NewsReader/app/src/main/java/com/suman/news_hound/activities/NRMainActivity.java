@@ -46,6 +46,7 @@ import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.R;
 import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.navigation_older_news.NROlderNewsList;
@@ -54,7 +55,6 @@ import com.suman.news_hound.utils.CameraUtils;
 import com.suman.news_hound.utils.ImageUtils;
 import com.suman.news_hound.utils.PermissionUtils;
 import com.suman.news_hound.utils.ViewUtils;
-import com.suman.news_reader.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -390,7 +390,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         if (uri != null) {
             try {
                 // Scale the image to 800px to save on bandwidth
-                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 600);
+                int orientation = ImageUtils.setOrientation(uri);
+                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 600, orientation);
                 //bitmap = ImageUtils.convertToEdgeDetector(bitmap);
                 //int x = bitmap.getByteCount();
                 mMainImage.setBackgroundResource(R.drawable.image_background);

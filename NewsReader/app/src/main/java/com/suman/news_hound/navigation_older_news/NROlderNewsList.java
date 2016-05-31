@@ -25,13 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.suman.news_hound.R;
 import com.suman.news_hound.activities.NRMainActivity;
 import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.utils.CameraUtils;
 import com.suman.news_hound.utils.PermissionUtils;
 import com.suman.news_hound.utils.ViewUtils;
-import com.suman.news_reader.R;
 
 import java.io.File;
 
