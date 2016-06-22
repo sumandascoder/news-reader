@@ -328,7 +328,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             if(new File(f + "/" + fileID + ".wav").exists()){
                 new File(f + "/" + fileID + ".wav").delete();
             }
-            tts.setLanguage(new Locale(Language.code[position]));
+            tts.setLanguage(new Locale(currentLanguageCode));
             if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
@@ -544,6 +544,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         if (textAnnotations != null) {
             speechText = "";
             speechText += String.format("%s", textAnnotations.get(0).getDescription());
+            currentLanguageCode = textAnnotations.get(0).getLocale();
             message += String.format("%s", textAnnotations.get(0).getDescription());
             onInit(TextToSpeech.SUCCESS);
         } else {

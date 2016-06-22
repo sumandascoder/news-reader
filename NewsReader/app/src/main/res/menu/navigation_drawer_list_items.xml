@@ -26,7 +26,7 @@
         <item
             android:id="@+id/nav_about"
             android:icon="@mipmap/ic_drawer_info"
-            android:title="About GLector"/>
+            android:title="About Reader"/>
 
         <item
             android:id="@+id/nav_contact"

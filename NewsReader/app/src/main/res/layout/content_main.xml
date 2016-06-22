@@ -80,6 +80,7 @@
                 android:layout_marginBottom="@dimen/main_activity_layout_margin_small"
                 android:textSize="@dimen/main_activity_text_size_content"
                 android:textColor="@color/processStatus"
+                android:textIsSelectable="true"
                 android:text=""/>
 
             <ImageView
