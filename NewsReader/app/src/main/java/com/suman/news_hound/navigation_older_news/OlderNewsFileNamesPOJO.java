@@ -20,6 +20,7 @@ public class OlderNewsFileNamesPOJO {
 
     public OlderNewsFileNamesPOJO(){
         if(files.exists()){
+            fileNames = new ArrayList<String>();
             int count = 0 ;
             if(files.listFiles() != null){
                 for(File file: files.listFiles()){

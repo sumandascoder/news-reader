@@ -3,6 +3,10 @@ package com.suman.news_hound.media_controllers;
 import android.Manifest;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -23,7 +27,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
+import android.content.CursorLoader;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_hound.R;
 import com.suman.news_hound.activities.NRMainActivity;
@@ -54,6 +58,8 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
     public static final int         CAMERA_PERMISSIONS_REQUEST = 2;
     public static String            FILE_NAME = "temp.jpg";
     public static String uriOfFile = "";
+    public static String imagePath = "";
+    public static Drawable backImage;
 
     private CameraUtils             cameraUtils;
     private ViewUtils               viewUtils;
@@ -77,25 +83,21 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                 if (menuItem.getItemId() == R.id.nav_older_news) {
                     Intent newsActivity = new Intent(getApplication(), NROlderNewsList.class);
                     startActivityForResult(newsActivity, 5);
-                }
-                else if (menuItem.getItemId() == R.id.nav_capture_image) {
+                } else if (menuItem.getItemId() == R.id.nav_capture_image) {
                     startCamera();
-                }
-                else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
+                } else if (menuItem.getItemId() == R.id.nav_load_from_gallery) {
                     Intent mainActivity = new Intent(NRMusicPlayerActivity.this, NRMainActivity.class);
                     mainActivity.putExtra("selectedNav", "Gallery");
                     setResult(RESULT_OK);
                     startActivity(mainActivity);
                     finish();
-                }
-                else if (menuItem.getItemId() == R.id.nav_about) {
+                } else if (menuItem.getItemId() == R.id.nav_about) {
                     Intent aboutIntent = new Intent(NRMusicPlayerActivity.this, AboutActivity.class);
                     startActivity(aboutIntent);
-                }
-                else if (menuItem.getItemId() == R.id.nav_contact){
+                } else if (menuItem.getItemId() == R.id.nav_contact) {
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setType("message/rfc822");
-                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"sumandas.freaky@gmail.com"});
+                    i.putExtra(Intent.EXTRA_EMAIL, new String[]{"sumandas.freaky@gmail.com"});
                     i.putExtra(Intent.EXTRA_SUBJECT, "Say hello or let us know whatsup?");
                     i.putExtra(Intent.EXTRA_TEXT, "Please add details");
                     try {
@@ -104,7 +106,7 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
                         Toast.makeText(NRMusicPlayerActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                if(player.isPlaying()){
+                if (player.isPlaying()) {
                     player.stop();
                 }
                 drawerLayout.closeDrawers();
@@ -121,6 +123,30 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
         SurfaceHolder videoHolder = audioSurface.getHolder();
         videoHolder.addCallback(this);
 
+        imagePath = getIntent().getStringExtra("imagePath");
+        if (imagePath == "") {
+            if (imagePath.contains("temp.jpg")) {
+                backImage = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(imagePath));
+            } else {
+                Cursor cursor = null;
+                try {
+                    String[] proj = {MediaStore.Images.Media.DATA};
+                    CursorLoader loader;
+                    loader = new CursorLoader(NRMusicPlayerActivity.this, Uri.parse(imagePath), proj, null, null, null);
+                    if (loader != null) {
+                        cursor = loader.loadInBackground();
+                        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                        cursor.moveToFirst();
+                        backImage = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(cursor.getString(column_index)));
+                    }
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                }
+                cursor.close();
+            }
+        }
         player = new MediaPlayer();
         controller = new NRAudioControllerView(this);
 
@@ -149,6 +175,19 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
             e.printStackTrace();
         } catch (IllegalStateException e) {
             e.printStackTrace();
+            player.reset();
+            try {
+                if(!fileID.contains(".wav")) {
+                    player.setDataSource(this, Uri.parse(dir + fileID + ".wav"));
+                }
+                else{
+                    player.setDataSource(this, Uri.parse(dir + fileID));
+                }
+            }
+            catch (IOException ie){
+                ie.printStackTrace();
+            }
+            player.setOnPreparedListener(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -209,7 +248,12 @@ public class NRMusicPlayerActivity extends AppCompatActivity implements SurfaceH
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         player.setDisplay(holder);
-        audioSurface.setBackgroundResource(R.drawable.photogallery);
+        if (imagePath == null) {
+            audioSurface.setBackgroundResource(R.drawable.photogallery);
+        }
+        else {
+            audioSurface.setBackground(backImage);
+        }
         // draw the background
         player.prepareAsync();
     }

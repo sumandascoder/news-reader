@@ -82,17 +82,19 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     public static final int         CAMERA_IMAGE_REQUEST = 3;
     public static final int         MUSIC_PLAYER_REQUEST = 4;
     public static final int         OLDER_NEWS_REQUEST = 5;
+    public static final int         CAMERA_CROP_IMAGE_REQUEST = 5;
 
     private static final String     TAG = NRMainActivity.class.getSimpleName();
     private static final int        GALLERY_IMAGE_REQUEST = 1;
-    private static final String     CLOUD_VISION_API_KEY = "AIzaSyCsGPZ_UVj0GRT6ii4GojaiDYf2c06lDDQ";
+    private static final String     CLOUD_VISION_API_KEY = "AIzaSyDsKNjWffflDGbZhyK8q8U-ZTlqxC1OlyI";//"AIzaSyCsGPZ_UVj0GRT6ii4GojaiDYf2c06lDDQ";
     private String                  speechText = "I have nothing to speak of now.";
-    private String                  fileID;
+    private static String                  fileID;
     private HashMap<String, String> map = new HashMap<String, String>();
     private String                  dir = Environment.getExternalStorageDirectory() + "/NewsReader/";
     private File                    f = new File(dir);
     private int                     position;
     private String                  currentLanguageCode = "en";
+    private static Uri              imagePath;
 
     // UI elements
     private TextView                progressStatusText;
@@ -209,7 +211,9 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         imageStatusText.setTypeface(Typeface.createFromAsset(getAssets(), "Roboto-Medium.ttf"));
         imageDetailsText.setTypeface(Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf"));
 
-        fileID = UUID.randomUUID().toString();
+        if (fileID == null) {
+            fileID = UUID.randomUUID().toString();
+        }
         tts = new TextToSpeech(this, this);
         tts.setLanguage(Locale.US);
         readTextButton.setText("Read out loud to me");
@@ -219,12 +223,24 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 Intent startMusic = new Intent(getApplication(), NRMusicPlayerActivity.class);
                 startMusic.putExtra("speechText", speechText);
                 startMusic.putExtra("fileID", fileID);
+                if (imagePath != null) {
+                    if (imagePath.toString().contains("content")) {
+                        // Image from loader needs content storage to be used
+                        startMusic.putExtra("imagePath", imagePath.toString());
+                    } else {
+                        // Path sent
+                        startMusic.putExtra("imagePath", imagePath.getPath());
+                    }
+                }
+                else {
+                    startMusic.putExtra("imagePath", "");
+                }
                 startActivityForResult(startMusic, MUSIC_PLAYER_REQUEST);
             }
         });
 
         if (getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT) != null) {
-            uploadImage((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
+            performCrop((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
         }
         else if (getIntent().getStringExtra("selectedNav") != null) {
             if(getIntent().getStringExtra("selectedNav").equals("Gallery")){
@@ -237,10 +253,16 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            imagePath = Uri.parse(data.getDataString());
             uploadImage(data.getData());
         }
         else if(requestCode == CAMERA_IMAGE_REQUEST && resultCode == RESULT_OK) {
-            uploadImage(Uri.fromFile(getCameraFile()));
+            performCrop(Uri.fromFile(getCameraFile()));
+        }
+        else if(requestCode == CAMERA_CROP_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            imagePath = Uri.parse(data.getDataString());
+            uploadImage(imagePath);
         }
         else if(requestCode == MUSIC_PLAYER_REQUEST && resultCode == RESULT_OK){
             // DO NOTHING
@@ -320,13 +342,14 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
     @Override
     public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
+        if (status == TextToSpeech.SUCCESS && ! speechText.equals("I have nothing to speak of now.")) {
             map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileID);
             if (!f.exists()) {
                 f.mkdirs();
             }
             if(new File(f + "/" + fileID + ".wav").exists()){
-                new File(f + "/" + fileID + ".wav").delete();
+                fileID = UUID.randomUUID().toString();
+                new File(f + "/" + fileID + ".wav");
             }
             tts.setLanguage(new Locale(currentLanguageCode));
             if(tts.synthesizeToFile(speechText, map, f + "/" + fileID + ".wav") == TextToSpeech.SUCCESS);
@@ -358,6 +381,26 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     public void onPositiveClick(int position) {
         this.position = position;
         new EnglishToTagalog().execute();
+    }
+
+    private void performCrop(Uri picUri){
+        //call the standard crop action intent (the user device may not support it)
+        Intent cropIntent = new Intent("com.android.camera.action.CROP");
+        //indicate image type and Uri
+        cropIntent.setDataAndType(picUri, "image/*");
+        //set crop properties
+        cropIntent.putExtra("crop", "true");
+        //indicate aspect of desired crop : 1:1 means square
+        //cropIntent.putExtra("aspectX", 1);
+        //cropIntent.putExtra("aspectY", 1);
+        //indicate output X and Y
+        cropIntent.putExtra("outputX", 256);
+        cropIntent.putExtra("outputY", 256);
+        //retrieve data on return
+        cropIntent.putExtra("return-data", true);
+        //start the activity - we handle returning in onActivityResult
+        cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
+        startActivityForResult(cropIntent, CAMERA_CROP_IMAGE_REQUEST);
     }
 
     // Choose image from photo gallery
@@ -458,7 +501,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         max = imageBytes.length;
 
                         // Keep it going till 9/10th so that value on progress bar proceeds upto a point
-                        for (int i = 0 ; i < imageBytes.length * 9/10; i++) {
+                        for (int i = 0 ; i < imageBytes.length * 9/10; i = i + (imageBytes.length*1/10)) {
                             publishProgress(i);
                         }
                         // Base64 encode the JPEG
@@ -468,8 +511,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                         // Add the features we want
                         annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
                             Feature textDetection = new Feature();
-                            textDetection.setType("TEXT_DETECTION");
-                            textDetection.setMaxResults(10);
+                            textDetection.setType("TEXT_DETECTION").setMaxResults(10);
                             add(textDetection);
                         }});
 
@@ -489,8 +531,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                 } catch (GoogleJsonResponseException e) {
                     Log.d(TAG, "failed to make API request because " + e.getContent());
                 } catch (IOException e) {
-                    Log.d(TAG, "failed to make API request because of other IOException " +
-                            e.getMessage());
+                    Log.d(TAG, "failed to make API request because of other IOException " + e.getMessage());
                 }
                 return "Cloud Vision API request failed. Check logs for details.";
             }
