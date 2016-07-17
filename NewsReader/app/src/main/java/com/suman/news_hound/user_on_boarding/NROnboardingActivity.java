@@ -23,9 +23,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_hound.R;
 import com.suman.news_hound.activities.FirstPageActionActivity;
 import com.suman.news_hound.activities.NRMainActivity;
+import com.suman.news_hound.utils.ViewUtils;
 
 /**
  * @author sumansucharitdas
@@ -48,6 +50,8 @@ public class NROnboardingActivity extends AppCompatActivity {
     private int                         page = 0;   //  to track page position
     public static boolean scrolledEnded = false;
     public static int curItem;
+    private ViewUtils viewUtils;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +59,23 @@ public class NROnboardingActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_onboarding);
 
+        viewUtils = new ViewUtils();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
         }
+
+        // Coloring and maintaining Material design UI
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            viewUtils.setTranslucentStatus(true, NROnboardingActivity.this);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setNavigationBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);
+        tintManager.setNavigationBarTintColor(R.color.colorPrimary);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -84,7 +99,6 @@ public class NROnboardingActivity extends AppCompatActivity {
         mViewPager.setCurrentItem(page);
         mViewPager.setPageTransformer(true, new NROnboardingTransformer());
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            private boolean enabled;
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

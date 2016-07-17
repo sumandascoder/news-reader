@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frame_main_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -34,16 +35,28 @@
 
             <include layout="@layout/content_main" />
 
-            <Button
-                android:id="@+id/read_button"
-                android:layout_width="match_parent"
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/read_FABbutton"
+                android:src="@mipmap/ic_read_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:backgroundTint="@color/colorPrimary"
+                android:visibility="invisible"
+                android:layout_gravity="end|bottom"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"/>
+
+            <fragment
+                class="com.suman.news_hound.media_controllers.NRMusicPlayerFragment"
+                android:id="@+id/music_player_fragment"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:theme="@style/AppCompat.Button"
-                android:visibility="invisible"
-                android:layout_gravity="bottom|center"/>
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center">
+
+            </fragment>
 
         </android.support.design.widget.CoordinatorLayout>
 

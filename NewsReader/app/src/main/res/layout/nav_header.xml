@@ -10,12 +10,12 @@
         android:background="@color/colorPrimary"
         android:scaleType="centerCrop" />
 
-    <ImageView
+    <!--<ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/news"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="36dp" />
+        android:layout_marginBottom="36dp" /> -->
 
     <!-- <TextView
         android:layout_width="match_parent"

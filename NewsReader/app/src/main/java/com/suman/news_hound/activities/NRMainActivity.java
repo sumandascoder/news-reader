@@ -16,7 +16,9 @@ import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -25,29 +27,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.vision.v1.Vision;
-import com.google.api.services.vision.v1.VisionRequestInitializer;
-import com.google.api.services.vision.v1.model.AnnotateImageRequest;
-import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
-import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
-import com.google.api.services.vision.v1.model.EntityAnnotation;
-import com.google.api.services.vision.v1.model.Feature;
-import com.google.api.services.vision.v1.model.Image;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_hound.R;
-import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
+import com.suman.news_hound.media_controllers.NRAudioControllerView;
+import com.suman.news_hound.media_controllers.NRMusicPlayerFragment;
 import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.navigation_older_news.NROlderNewsList;
 import com.suman.news_hound.navigation_older_news.OlderNewsFileNamesPOJO;
@@ -56,14 +45,9 @@ import com.suman.news_hound.utils.ImageUtils;
 import com.suman.news_hound.utils.PermissionUtils;
 import com.suman.news_hound.utils.ViewUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -87,24 +71,27 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
     private static final String     TAG = NRMainActivity.class.getSimpleName();
     private static final int        GALLERY_IMAGE_REQUEST = 1;
     private static final String     CLOUD_VISION_API_KEY = "AIzaSyDsKNjWffflDGbZhyK8q8U-ZTlqxC1OlyI";//"AIzaSyCsGPZ_UVj0GRT6ii4GojaiDYf2c06lDDQ";
-    private String                  speechText = "I have nothing to speak of now.";
-    private static String                  fileID;
+    public static String                  speechText = "I have nothing to speak of now.";
+    public static String                  fileID;
     private HashMap<String, String> map = new HashMap<String, String>();
     private String                  dir = Environment.getExternalStorageDirectory() + "/NewsReader/";
     private File                    f = new File(dir);
     private int                     position;
-    private String                  currentLanguageCode = "en";
+    public static String                  currentLanguageCode = "en";
     private static Uri              imagePath;
 
     // UI elements
-    private TextView                progressStatusText;
-    private TextView                imageStatusText;
-    private TextView                imageDetailsText;
+    public static TextView                progressStatusText;
+    public static TextView                imageStatusText;
+    public static TextView                imageDetailsText;
+    public static Bitmap bitmap;
+    public CloudVision cloudVision;
+
     private ImageView               mMainImage;
-    private ImageView               blurImage;
+    public static ImageView               blurImage;
     private TextToSpeech            tts;
-    private Button                  readTextButton;
-    private ProgressBar             progressBarImageExtract;
+    public static FloatingActionButton readFABButton;
+    public static ProgressBar             progressBarImageExtract;
     private DrawerLayout            drawerLayout;
     private ActionBarDrawerToggle   drawerToggle;
     private NavigationView          navView;
@@ -115,6 +102,9 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
     private CameraUtils             cameraUtils;
     private ViewUtils               viewUtils;
+    private NRMusicPlayerFragment musicPlayerFragment;
+    private FragmentTransaction fragmentTransaction;
+    public static NRAudioControllerView controller;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -130,6 +120,12 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        musicPlayerFragment = (NRMusicPlayerFragment)
+                getSupportFragmentManager().findFragmentById(R.id.music_player_fragment);
+        fragmentTransaction.hide(musicPlayerFragment);
+        fragmentTransaction.commit();
 
         navView = (NavigationView) findViewById(R.id.navigation);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -186,6 +182,8 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        controller = new NRAudioControllerView(getApplicationContext());
+
         rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
 
         // Coloring and maintaining Material design UI
@@ -199,7 +197,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         tintManager.setNavigationBarTintColor(R.color.colorPrimary);
 
         // UI id assignment
-        readTextButton = (Button) findViewById(R.id.read_button);
+        readFABButton = (FloatingActionButton) findViewById(R.id.read_FABbutton);
         progressBarImageExtract = (ProgressBar) findViewById(R.id.progressBar);
         mMainImage = (ImageView) findViewById(R.id.main_image);
         blurImage = (ImageView) findViewById(R.id.blur_ocr_image);
@@ -216,26 +214,14 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         }
         tts = new TextToSpeech(this, this);
         tts.setLanguage(Locale.US);
-        readTextButton.setText("Read out loud to me");
-        readTextButton.setOnClickListener(new View.OnClickListener() {
+        readFABButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent startMusic = new Intent(getApplication(), NRMusicPlayerActivity.class);
-                startMusic.putExtra("speechText", speechText);
-                startMusic.putExtra("fileID", fileID);
-                if (imagePath != null) {
-                    if (imagePath.toString().contains("content")) {
-                        // Image from loader needs content storage to be used
-                        startMusic.putExtra("imagePath", imagePath.toString());
-                    } else {
-                        // Path sent
-                        startMusic.putExtra("imagePath", imagePath.getPath());
-                    }
-                }
-                else {
-                    startMusic.putExtra("imagePath", "");
-                }
-                startActivityForResult(startMusic, MUSIC_PLAYER_REQUEST);
+                readFABButton.setVisibility(View.INVISIBLE);
+                controller.setMediaPlayer(musicPlayerFragment);
+                controller.setAnchorView((FrameLayout) findViewById(R.id.frame_main_activity));
+                musicPlayerFragment.setStream();
+                controller.show();
             }
         });
 
@@ -246,6 +232,11 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             if(getIntent().getStringExtra("selectedNav").equals("Gallery")){
                 startGalleryChooser();
             }
+        }
+
+        if(getIntent().getBooleanExtra("olderNews", false) == true){
+            fileID = getIntent().getStringExtra("fileID");
+            readFABButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -363,7 +354,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            readTextButton.setVisibility(View.VISIBLE);
+                            readFABButton.setVisibility(View.VISIBLE);
                         }
                     });
                 }
@@ -434,7 +425,7 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
             try {
                 // Scale the image to 800px to save on bandwidth
                 int orientation = ImageUtils.setOrientation(uri);
-                Bitmap bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 600, orientation);
+                bitmap = ImageUtils.scaleBitmapDown(MediaStore.Images.Media.getBitmap(getContentResolver(), uri), 600, orientation);
                 //bitmap = ImageUtils.convertToEdgeDetector(bitmap);
                 //int x = bitmap.getByteCount();
                 mMainImage.setBackgroundResource(R.drawable.image_background);
@@ -456,143 +447,13 @@ public class NRMainActivity extends AppCompatActivity implements TextToSpeech.On
         // Switch text to loading
         imageStatusText.setText(R.string.loading_message);
 
-        // Do the real work in an async task, because we need to use the network anyway
-        new AsyncTask<Object, Integer, String>() {
-            int max = 0;
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                progressBarImageExtract.setVisibility(View.VISIBLE);
-                progressBarImageExtract.setProgress(0);
-            }
-
-            @Override
-            protected String doInBackground(Object... params) {
-                try {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            readTextButton.setVisibility(View.INVISIBLE);
-                            progressStatusText.setText("");
-                            imageDetailsText.setText("");
-                        }
-                    });
-                    HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
-                    JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-
-                    Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
-                    builder.setVisionRequestInitializer(new VisionRequestInitializer(CLOUD_VISION_API_KEY));
-                    Vision vision = builder.build();
-
-                    BatchAnnotateImagesRequest batchAnnotateImagesRequest =
-                            new BatchAnnotateImagesRequest();
-                    batchAnnotateImagesRequest.setRequests(new ArrayList<AnnotateImageRequest>() {{
-                        AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
-
-                        // Add the image
-                        Image base64EncodedImage = new Image();
-                        // Convert the bitmap to a JPEG
-                        // Just in case it's a format that Android understands but Cloud Vision
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-                        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-                        progressBarImageExtract.setMax(imageBytes.length);
-                        max = imageBytes.length;
-
-                        // Keep it going till 9/10th so that value on progress bar proceeds upto a point
-                        for (int i = 0 ; i < imageBytes.length * 9/10; i = i + (imageBytes.length*1/10)) {
-                            publishProgress(i);
-                        }
-                        // Base64 encode the JPEG
-                        base64EncodedImage.encodeContent(imageBytes);
-                        annotateImageRequest.setImage(base64EncodedImage);
-
-                        // Add the features we want
-                        annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                            Feature textDetection = new Feature();
-                            textDetection.setType("TEXT_DETECTION").setMaxResults(10);
-                            add(textDetection);
-                        }});
-
-                        // Add the list of one thing to the request
-                        add(annotateImageRequest);
-                    }});
-
-                    Vision.Images.Annotate annotateRequest =
-                            vision.images().annotate(batchAnnotateImagesRequest);
-                    // Due to a bug: requests to Vision API containing large images fail when GZipped.
-                    annotateRequest.setDisableGZipContent(true);
-                    Log.d(TAG, "created Cloud Vision request object, sending request");
-
-                    BatchAnnotateImagesResponse response = annotateRequest.execute();
-                    return convertResponseToString(response);
-
-                } catch (GoogleJsonResponseException e) {
-                    Log.d(TAG, "failed to make API request because " + e.getContent());
-                } catch (IOException e) {
-                    Log.d(TAG, "failed to make API request because of other IOException " + e.getMessage());
-                }
-                return "Cloud Vision API request failed. Check logs for details.";
-            }
-
-            @Override
-            protected void onProgressUpdate(Integer... values) {
-                readTextButton.setVisibility(View.INVISIBLE);
-                if(values[0] < max){
-                    progressStatusText.setText("Uploading ... ");
-                    progressBarImageExtract.setProgress(values[0]);
-                }
-                if (values[0] > max/2){
-                    progressStatusText.setText("Extracting the text ... Sit tight!");
-                    imageStatusText.setVisibility(View.VISIBLE);
-                    if(values[0] > 8 * max/10){
-                        imageStatusText.setText("Extracted Text from Image:");
-                        LayoutParams layoutParams = blurImage.getLayoutParams();
-                        final float scale = getResources().getDisplayMetrics().density;
-                        int dpHeightInPx = (int) (140 * scale);
-                        blurImage.getLayoutParams().height = dpHeightInPx;
-                        blurImage.setLayoutParams(layoutParams);
-                        blurImage.setVisibility(View.VISIBLE);
-                    }
-                }
-                else if((values[0] == max/2)){
-                    progressStatusText.setText("Uploading ... 50%");
-                    imageStatusText.setVisibility(View.INVISIBLE);
-                }
-                if (values[0] < max/2){
-                    imageStatusText.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            protected void onPostExecute(String result) {
-                progressBarImageExtract.setProgress(max);
-                progressStatusText.setText("Auto saved to News Library. Dated: " + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a").format(new Date()));
-                imageStatusText.setText("Extracted text from Image:");
-                imageDetailsText.setText(result);
-                blurImage.getLayoutParams().height = 0;
-                blurImage.setVisibility(View.INVISIBLE);
-                progressBarImageExtract.setVisibility(View.INVISIBLE);
-            }
-        }.execute();
+        cloudVision = new CloudVision(NRMainActivity.this, CLOUD_VISION_API_KEY);
+        cloudVision.execute(bitmap);
     }
 
     // Extract the string from the Google OCR service
-    private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        String message = "";
-        List<EntityAnnotation> textAnnotations = response.getResponses().get(0).getTextAnnotations();
-        Log.i("Response", response.toString() + "");
-        if (textAnnotations != null) {
-            speechText = "";
-            speechText += String.format("%s", textAnnotations.get(0).getDescription());
-            currentLanguageCode = textAnnotations.get(0).getLocale();
-            message += String.format("%s", textAnnotations.get(0).getDescription());
-            onInit(TextToSpeech.SUCCESS);
-        } else {
-            speechText = "I found no text";
-            message += "No text";
-        }
-        return message;
+    public void initSpeech() {
+        onInit(TextToSpeech.SUCCESS);
     }
 
     private class EnglishToTagalog extends AsyncTask<Void, Void, Void> {

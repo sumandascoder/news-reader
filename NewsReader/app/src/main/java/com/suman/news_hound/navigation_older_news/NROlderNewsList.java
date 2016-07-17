@@ -27,7 +27,6 @@ import android.widget.Toast;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.suman.news_hound.R;
 import com.suman.news_hound.activities.NRMainActivity;
-import com.suman.news_hound.media_controllers.NRMusicPlayerActivity;
 import com.suman.news_hound.navigation_informational.AboutActivity;
 import com.suman.news_hound.utils.CameraUtils;
 import com.suman.news_hound.utils.PermissionUtils;
@@ -131,8 +130,9 @@ public class NROlderNewsList  extends AppCompatActivity{
         thumbnailList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent startMusic = new Intent(getApplication(), NRMusicPlayerActivity.class);
+                Intent startMusic = new Intent(getApplication(), NRMainActivity.class);
                 startMusic.putExtra("fileID", OlderNewsFileNamesPOJO.fileNames.get(position));
+                startMusic.putExtra("olderNews", true);
                 startActivity(startMusic);
             }
         });
